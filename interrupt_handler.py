@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 from datetime import datetime, timedelta
+import time
 
 PIN = 2
 
@@ -8,11 +9,18 @@ GPIO.setup(PIN, GPIO.IN)
 
 time = datetime.now()
 count = 0
-while True:
-    GPIO.wait_for_edge(PIN, GPIO.RISING)
+
+
+def countUp(channel):
+    global count
     count += 1
 
-    if datetime.now() - time > timedelta(seconds=1):
-        print("Count: {}, Span: {}", count, datetime.now() - time)
-        time = datetime.now()
-        count = 0
+
+GPIO.add_event_detect(PIN, GPIO.RISING, callback=countUp)
+
+
+while True:
+    print("Count: {}, Span: {}", count, datetime.now() - time)
+    time = datetime.now()
+    count = 0
+    time.sleep(1)
