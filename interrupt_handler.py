@@ -3,9 +3,7 @@ from datetime import datetime, timedelta
 import time
 
 PIN = 2
-
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(PIN, GPIO.IN)
 
 time = datetime.now()
 count = 0
@@ -17,7 +15,7 @@ def countUp(channel):
 
 
 GPIO.add_event_detect(PIN, GPIO.RISING, callback=countUp)
-
+GPIO.setup(PIN, GPIO.IN)
 
 while True:
     print("Count: {}, Span: {}", count, datetime.now() - time)
