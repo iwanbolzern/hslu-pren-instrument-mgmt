@@ -38,7 +38,7 @@ class UICommunication:
                 i += 1
             except Exception as ex:
                 print("Not able to send to client: {}".format(self.clients[i].address))
-                self.clients[i].conn.shutdown()
+                self.clients[i].conn.shutdown(socket.SHUT_RDWR)
                 self.clients[i].conn.close()
                 print("Client {} removed from distribution list".format(self.clients[i].address))
                 self.clients.remove(self.clients[i])
