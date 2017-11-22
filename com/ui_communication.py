@@ -27,12 +27,22 @@ class UICommunication:
         self._send_msg('2{}'.format(log_msg))
 
     def _send_msg(self, data):
-        for client in self.clients:
+        i = 0
+        while i < len(self.clients):
             payload = data.encode('utf-8')
             if len(payload) > 99999:
                 raise Exception('Payload is longer than protocol supports')
             length = '{:0>5}'.format(len(payload)).encode('utf-8')
-            client.conn.send(length + payload)
+            try:
+                self.clients[i].conn.send(length + payload)
+                i += 1
+            except Exception as ex:
+                print("Not able to send to client: {}".format(self.clients[i].address))
+                self.clients[i].conn.shutdown()
+                self.clients[i].conn.close()
+                print("Client {} removed from distribution list".format(self.clients[i].address))
+                self.clients.remove(self.clients[i])
+
 
     def stop(self):
         if self.listen_thread:
@@ -52,7 +62,7 @@ class UICommunication:
                 conn, address = self.server_socket.accept()
                 receive_thread = Thread(target=self._receive, args=(conn,))
                 receive_thread.start()
-                self.clients.append(Generic(conn=conn, receive_thread=receive_thread))
+                self.clients.append(Generic(conn=conn, receive_thread=receive_thread, address=address))
                 print("Client {} connected to live stream\n".format(address))
             except Exception as ex:
                 if ex.args and ex.args[0] == 'timed out':
