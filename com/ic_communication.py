@@ -1,7 +1,8 @@
 import time
+from concurrent.futures import ThreadPoolExecutor
 from queue import Queue
 from threading import Event, Thread
-from typing import List
+from typing import List, Callable
 
 import serial
 
@@ -12,7 +13,7 @@ class ICCommunication:
         self.stop_event = None
         self.serial_thread = None
         self.callbacks = []
-
+        self.callback_thread_pool = ThreadPoolExecutor()
 
     def start(self):
         self.stop()
@@ -23,20 +24,8 @@ class ICCommunication:
         self.serial_thread = Thread(target=self._serial_handle, args=(self.stop_event,))
         self.serial_thread.start()
 
-    def register_callback(self, callback):
+    def register_callback(self, callback: Callable[int, List[chr]]):
         self.callbacks.append(callback)
-
-    def _on_receive(self, payload):
-        cmd_id = payload[0]
-        data = payload[1:]
-
-        for callback in self.callbacks:
-            callback(cmd_id, data)
-
-    def _send_msg(self, cmd_id: int, data: List[chr]):
-        cmd_byte = chr(cmd_id)
-        msg = [cmd_byte] + data
-        self.message_queue.put(msg)
 
     def stop(self):
         if self.serial_thread:
@@ -45,6 +34,18 @@ class ICCommunication:
             self.serial = None
             self.serial_thread = None
             self.stop_event = None
+
+    def _on_receive(self, payload: List[chr]):
+        cmd_id = payload[0]
+        data = payload[1:]
+
+        for callback in self.callbacks:
+            self.callback_thread_pool.submit(callback, (cmd_id, data))
+
+    def send_msg(self, cmd_id: int, data: List[chr]=[]):
+        cmd_byte = chr(cmd_id)
+        msg = [cmd_byte] + data
+        self.message_queue.put(msg)
 
     def _serial_handle(self):
         # init serial port
