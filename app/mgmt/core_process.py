@@ -5,53 +5,9 @@ from typing import List
 
 from app.com.ic_interface import ICInterface
 from app.com.ui_interface import UIInterface
+from mgmt.steps_base import Step, Context, CancleStep
+from mgmt.steps_init import WaitForInitStep, InitStep
 from utils import log
-
-
-class Context:
-    def __init__(self):
-        self.ic_interface: ICInterface = None
-        self.ui_interface: UIInterface = None
-
-class Step:
-
-    def __init__(self, context: Context):
-        self.context = context
-        self.next_steps = []
-        self.is_canceled = False
-
-    @abstractmethod
-    def run(self):
-        pass
-
-    def cancel(self):
-        self.is_canceled = True
-
-    def set_next_steps(self, next_steps):
-        self.next_steps = next_steps
-
-class CancleStep(Step):
-
-    def __init__(self, context: Context, steps_to_cancle: List[Step]):
-        super(CancleStep, self).__init__(context)
-        self.steps_to_cancel = steps_to_cancle
-
-    def run(self):
-        for step in self.steps_to_cancel:
-            step.cancel()
-
-class WaitForInitStep(Step):
-
-    def __init__(self, context: Context):
-        super(WaitForInitStep, self).__init__(context)
-
-    def run(self):
-        log.debug('WaitForInitStep started')
-        event = Event()
-        self.context.ui_interface.register_init_once(lambda: event.set())
-        log.info('Waiting for init callback')
-        event.wait()
-        log.info('Init callback received')
 
 
 class WaitForStartStep(Step):
@@ -85,13 +41,19 @@ class CoreProcess:
 
     def _init_steps(self):
         wait_for_init_step = WaitForInitStep(self.context)
+        init_step = InitStep(self.context)
         wait_for_start_step = WaitForStartStep(self.context)
 
         cancle_wait_for_start_step = CancleStep(self.context, [wait_for_start_step])
         cancle_wait_for_init_step = CancleStep(self.context, [wait_for_init_step])
 
         # connect steps
+        # init loop
         wait_for_init_step.set_next_steps([cancle_wait_for_start_step])
+        cancle_wait_for_start_step.set_next_steps([init_step])
+        init_step.set_next_steps([wait_for_start_step, wait_for_init_step])
+
+        #start loop
         wait_for_start_step.set_next_steps([cancle_wait_for_init_step])
 
         # set start steps

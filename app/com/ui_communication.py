@@ -81,7 +81,10 @@ class UICommunication:
 
     def _receive(self, conn):
         while True:
-            msg_length = int(conn.recv(5).decode("utf-8"))
+            payload = conn.recv(5)
+            if payload == b'':
+                raise RuntimeError("socket connection broken")
+            msg_length = int(payload.decode("utf-8"))
             payload = conn.recv(msg_length)
             if payload == b'':
                 raise RuntimeError("socket connection broken")

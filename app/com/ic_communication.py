@@ -43,9 +43,9 @@ class ICCommunication:
             future = self.callback_thread_pool.submit(callback, cmd_id, data)
             future.add_done_callback(lambda x: x.result())
 
-    def send_msg(self, cmd_id: int, data: List[chr]=[]):
-        cmd_byte = chr(cmd_id)
-        msg = [cmd_byte] + data
+    def send_msg(self, cmd_id: int, data: bytes=b''):
+        cmd_byte = cmd_id.to_bytes(1, 'big')
+        msg = cmd_byte + data
         self.message_queue.put(msg)
 
     def _serial_handle(self):
@@ -61,7 +61,7 @@ class ICCommunication:
         while not self.stop_event.is_set():
             while not self.message_queue.empty():
                 msg = self.message_queue.get()
-                self.serial.write(msg)
+                self.serial.write(len(msg).to_bytes(2, 'big') + msg)
 
             while self.serial.inWaiting() >= 2:
                 length = self.serial.read(2)
