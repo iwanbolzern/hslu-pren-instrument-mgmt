@@ -29,7 +29,8 @@ class ICInterface:
     def __init__(self):
         self.ic_com = ICCommunication()
         self.ic_com.register_callback(self.ic_callback)
-        self.callback_queue = defaultdict(list)
+        self.callback_once = defaultdict(list)
+        self.callback_permanent = defaultdict(list)
 
         # start ic communication
         self.ic_com.start()
@@ -42,6 +43,12 @@ class ICInterface:
     def init_tele_async(self, callback, timeout: float=None):
         raise NotImplementedError()
 
+    def register_position_callback(self, callback):
+        self.callback_permanent[self.CMD_POSITION_FEEDBACK].append(callback)
+
+    def unregister_position_callback(self, callback):
+        self.callback_permanent[self.CMD_POSITION_FEEDBACK].remove(callback)
+
     def drive_distance_async(self, distance: int, speed: chr,
                              direction: Direction, callback):
         payload = distance.to_bytes(2, byteorder='big')
@@ -49,19 +56,23 @@ class ICInterface:
         payload.append(direction.value)
 
         self.ic_com.send_msg(self.CMD_DRIVE_DISTANCE)
-        self.callback_queue[self.CMD_DRIVE_DISTANCE]\
+        self.callback_once[self.CMD_DRIVE_DISTANCE]\
             .append(callback)
 
     def _wait_for_ic_callback(self, cmd_id: int, timeout: float):
         thread_event = Event()
-        self.callback_queue[cmd_id].append(lambda: thread_event.set())
+        self.callback_once[cmd_id].append(lambda: thread_event.set())
         timeout = not thread_event.wait(timeout)
         if timeout:
             raise Exception('Not received callback within timeout: CMD_ID {}, timeout {}'.format(cmd_id, timeout))
 
     def ic_callback(self, cmd_id: int, payload: List[chr]):
-        if cmd_id in self.callback_queue:
-            for callback in self.callback_queue.pop(cmd_id):
+        if cmd_id in self.callback_once:
+            for callback in self.callback_once.pop(cmd_id):
+                callback()
+
+        if cmd_id in self.callback_permanent:
+            for callback in self.callback_permanent[cmd_id]:
                 callback()
 
 
