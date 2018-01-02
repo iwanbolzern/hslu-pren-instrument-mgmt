@@ -1,7 +1,9 @@
 import socket
+from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
+from typing import List, Callable
 
-from utils.generic import Generic
+from app.utils.generic import Generic
 
 
 class UICommunication:
@@ -12,6 +14,10 @@ class UICommunication:
         self.is_listening = False
         self.clients = []
 
+        # callbacks
+        self.callbacks = []
+        self.callback_thread_pool = ThreadPoolExecutor()
+
     def start(self, ip_address: str='', port: int=5006):
         self.stop()
 
@@ -19,6 +25,9 @@ class UICommunication:
         self.is_listening = True
         self.listen_thread = Thread(target=self._listen, args=(ip_address, port))
         self.listen_thread.start()
+
+    def register_callback(self, callback: Callable[[int, List[chr]], None]):
+        self.callbacks.append(callback)
 
     def send_position(self, x, y):
         self._send_msg('1{},{}'.format(x, y))
@@ -63,13 +72,26 @@ class UICommunication:
                 receive_thread = Thread(target=self._receive, args=(conn,))
                 receive_thread.start()
                 self.clients.append(Generic(conn=conn, receive_thread=receive_thread, address=address))
-                print("Client {} connected to live stream\n".format(address))
+                print("Client {} connected to Richi Bahn\n".format(address))
             except Exception as ex:
                 if ex.args and ex.args[0] == 'timed out':
                     pass # ignore time out exception
                 else:
                     raise ex
 
-
     def _receive(self, conn):
-        pass
+        while True:
+            msg_length = int(conn.recv(5).decode("utf-8"))
+            payload = conn.recv(msg_length)
+            if payload == b'':
+                raise RuntimeError("socket connection broken")
+            self._on_receive(payload)
+
+    def _on_receive(self, payload):
+        payload = payload.decode("utf-8")
+        cmd_id = int(payload[0])
+        data = payload[1:]
+
+        for callback in self.callbacks:
+            future = self.callback_thread_pool.submit(callback, cmd_id, data)
+            future.add_done_callback(lambda x: x.result())

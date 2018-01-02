@@ -21,10 +21,10 @@ class ICCommunication:
         # start listen
         self.stop_event = Event()
         self.message_queue = Queue()
-        self.serial_thread = Thread(target=self._serial_handle, args=(self.stop_event,))
+        self.serial_thread = Thread(target=self._serial_handle)
         self.serial_thread.start()
 
-    def register_callback(self, callback: Callable[int, List[chr]]):
+    def register_callback(self, callback: Callable[[int, List[chr]], None]):
         self.callbacks.append(callback)
 
     def stop(self):
@@ -40,7 +40,8 @@ class ICCommunication:
         data = payload[1:]
 
         for callback in self.callbacks:
-            self.callback_thread_pool.submit(callback, (cmd_id, data))
+            future = self.callback_thread_pool.submit(callback, cmd_id, data)
+            future.add_done_callback(lambda x: x.result())
 
     def send_msg(self, cmd_id: int, data: List[chr]=[]):
         cmd_byte = chr(cmd_id)
@@ -50,7 +51,7 @@ class ICCommunication:
     def _serial_handle(self):
         # init serial port
         self.serial = serial.Serial(
-            port='/dev/ttyAMA0',
+            port='COM1',
             baudrate=9600,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,

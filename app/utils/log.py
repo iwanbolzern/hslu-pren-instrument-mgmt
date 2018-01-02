@@ -5,22 +5,27 @@ import sys
 
 
 def info(msg, extra={}):
+    print("info: " + msg)
     logging.info(msg, extra=extra)
 
 
 def warn(msg, extra={}):
+    print("warn: " + msg)
     logging.warning(msg, extra=extra)
 
 
 def error(msg, extra={}):
+    print("error: " + msg)
     logging.error(msg, extra=extra)
 
 
 def critical(msg, extra={}):
+    print("critical: " + msg)
     logging.critical(msg, extra=extra)
 
 
 def debug(msg, extra={}):
+    print("debug: " + msg)
     logging.debug(msg, extra=extra)
 
 

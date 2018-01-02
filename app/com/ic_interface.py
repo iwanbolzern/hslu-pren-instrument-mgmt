@@ -3,7 +3,7 @@ from enum import Enum
 from threading import Event
 from typing import List
 
-from com.ic_communication import ICCommunication
+from app.com.ic_communication import ICCommunication
 
 class Direction(Enum):
     Forward = chr(0)
@@ -31,6 +31,9 @@ class ICInterface:
         self.ic_com.register_callback(self.ic_callback)
         self.callback_queue = defaultdict(list)
 
+        # start ic communication
+        self.ic_com.start()
+
     # send Commands
     def init_tele(self, timeout: float=None):
         self.ic_com.send_msg(self.CMD_INIT_TELE)
@@ -48,8 +51,6 @@ class ICInterface:
         self.ic_com.send_msg(self.CMD_DRIVE_DISTANCE)
         self.callback_queue[self.CMD_DRIVE_DISTANCE]\
             .append(callback)
-
-
 
     def _wait_for_ic_callback(self, cmd_id: int, timeout: float):
         thread_event = Event()

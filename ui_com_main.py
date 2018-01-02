@@ -1,6 +1,6 @@
 import time
 
-from com.ui_communication import UICommunication
+from app.com.ui_communication import UICommunication
 
 ui_com = UICommunication()
 ui_com.start()
