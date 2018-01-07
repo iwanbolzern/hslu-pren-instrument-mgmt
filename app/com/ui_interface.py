@@ -25,6 +25,12 @@ class UIInterface:
         # start ui communication
         self.ui_com.start()
 
+    def send_log(self, log_msg):
+        self.ui_com.send_msg('{}{}'.format(self.CMD_LOG, log_msg))
+
+    def send_position_update(self, x_position, z_position):
+        self.ui_com.send_msg('{}{},{}'.format(self.CMD_POSITION_FEEDBACK, x_position, z_position))
+
     def register_init_once(self, callback):
         self.callback[self.CMD_INIT].append(callback)
 

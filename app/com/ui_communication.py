@@ -29,13 +29,7 @@ class UICommunication:
     def register_callback(self, callback: Callable[[int, List[chr]], None]):
         self.callbacks.append(callback)
 
-    def send_position(self, x, y):
-        self._send_msg('1{},{}'.format(x, y))
-
-    def send_log(self, log_msg):
-        self._send_msg('2{}'.format(log_msg))
-
-    def _send_msg(self, data):
+    def send_msg(self, data):
         i = 0
         while i < len(self.clients):
             payload = data.encode('utf-8')

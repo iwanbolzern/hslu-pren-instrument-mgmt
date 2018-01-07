@@ -1,4 +1,6 @@
 from abc import abstractmethod
+from enum import Enum
+from threading import Event
 from typing import List
 
 from com.ic_interface import ICInterface
@@ -10,6 +12,10 @@ class Context:
         self.ic_interface: ICInterface = None
         self.ui_interface: UIInterface = None
 
+class StepResult(Enum):
+    SUCCESS = 0
+    SYNC = 1
+
 
 class Step:
 
@@ -17,6 +23,7 @@ class Step:
         self.context = context
         self.next_steps = []
         self.is_canceled = False
+        self.load_present = False
 
     @abstractmethod
     def run(self):
@@ -27,6 +34,21 @@ class Step:
 
     def set_next_steps(self, next_steps):
         self.next_steps = next_steps
+
+class SyncStep(Step):
+
+    def __init__(self, context: Context, step_count_to_wait_for: int):
+        super(CancleStep, self).__init__(context)
+        self.step_count_to_wait_for = step_count_to_wait_for
+        self.steps_done = 0
+        self.wait_event = Event()
+
+    def run(self):
+        self.steps_done += 1
+        if self.steps_done < self.step_count_to_wait_for:
+            return StepResult.SYNC
+        self.steps_done = 0
+
 
 class CancleStep(Step):
 

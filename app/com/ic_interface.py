@@ -1,13 +1,17 @@
 from collections import defaultdict
 from enum import Enum
 from threading import Event
-from typing import List
+from typing import List, Callable
 
 from app.com.ic_communication import ICCommunication
 
 class Direction(Enum):
     Forward = chr(0)
     Backward = chr(1)
+
+class MagnetDirection(Enum):
+    Enforce = chr(1)
+    Release = chr(0)
 
 class ICInterface:
 
@@ -43,11 +47,18 @@ class ICInterface:
     def init_tele_async(self, callback, timeout: float=None):
         raise NotImplementedError()
 
-    def register_position_callback(self, callback):
+    def register_position_callback(self, callback: Callable[[int, int], None]):
         self.callback_permanent[self.CMD_POSITION_FEEDBACK].append(callback)
 
     def unregister_position_callback(self, callback):
         self.callback_permanent[self.CMD_POSITION_FEEDBACK].remove(callback)
+
+    def move_tele_async(self, distance: int, direction: Direction, callback):
+        payload = distance.to_bytes(2, byteorder='big')
+        payload.append(direction.value)
+
+        self.ic_com.send_msg(self.CMD_MOVE_TELE, payload)
+        self.callback_once[self.CMD_EMD_MOVE_TELE].append(callback)
 
     def drive_distance_async(self, distance: int, speed: chr,
                              direction: Direction, callback):
@@ -55,9 +66,15 @@ class ICInterface:
         payload.append(speed)
         payload.append(direction.value)
 
-        self.ic_com.send_msg(self.CMD_DRIVE_DISTANCE)
-        self.callback_once[self.CMD_DRIVE_DISTANCE]\
+        self.ic_com.send_msg(self.CMD_DRIVE_DISTANCE, payload)
+        self.callback_once[self.CMD_END_DRIVE]\
             .append(callback)
+
+    def enable_magnet(self, direction: MagnetDirection):
+        payload = b''
+        payload.append(direction.value)
+
+        self.ic_com.send_msg(self.CMD_ENABLE_MAGNET, payload)
 
     def _wait_for_ic_callback(self, cmd_id: int, timeout: float):
         thread_event = Event()
@@ -67,13 +84,22 @@ class ICInterface:
             raise Exception('Not received callback within timeout: CMD_ID {}, timeout {}'.format(cmd_id, timeout))
 
     def ic_callback(self, cmd_id: int, payload: List[chr]):
+        parameters = self._extract_parameters(cmd_id, payload)
         if cmd_id in self.callback_once:
             for callback in self.callback_once.pop(cmd_id):
-                callback()
+                callback(*parameters)
 
         if cmd_id in self.callback_permanent:
             for callback in self.callback_permanent[cmd_id]:
-                callback()
+                callback(*parameters)
+
+    def _extract_parameters(self, cmd_id: int, payload: bytes):
+        if cmd_id == self.CMD_POSITION_FEEDBACK:
+            x_position = int.from_bytes(payload[:1], 'big')
+            z_position = int.from_bytes(payload[2:3], 'big')
+            return [x_position, z_position]
+        else:
+            raise NotImplementedError()
 
 
 

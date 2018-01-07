@@ -11,11 +11,16 @@ class WaitForInitStep(Step):
 
     def run(self):
         log.debug('WaitForInitStep started')
-        event = Event()
-        self.context.ui_interface.register_init_once(lambda: event.set())
+        self.event = Event()
+        self.context.ui_interface.register_init_once(lambda: self.event.set())
         log.info('Waiting for init callback')
-        event.wait()
-        log.info('Init callback received')
+        self.event.wait()
+        if not self.is_canceled:
+            log.info('Init callback received')
+
+    def cancel(self):
+        super(WaitForInitStep, self).cancel()
+        self.event.set()
 
 
 class InitStep(Step):
