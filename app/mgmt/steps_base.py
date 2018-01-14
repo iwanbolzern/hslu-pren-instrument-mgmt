@@ -5,12 +5,38 @@ from typing import List
 
 from com.ic_interface import ICInterface
 from com.ui_interface import UIInterface
+from mgmt import mgmt_utils
+from target_recognition.target_recognition import TargetRecognition
 
 
 class Context:
     def __init__(self):
+        # handles
         self.ic_interface: ICInterface = None
         self.ui_interface: UIInterface = None
+        self.target_recognition: TargetRecognition = None
+
+        # infos
+        self.x_position: int = None
+        self.z_position: int = None
+
+        self._x_offset: int = None
+        self._z_position_on_target = None
+
+    @property
+    def z_position_on_target(self):
+        return self._z_position_on_target
+
+    @property
+    def x_offset(self):
+        return self._x_offset
+
+    @x_offset.setter
+    def x_offset(self, value):
+        self._x_offset = value
+        self._z_position_on_target = mgmt_utils.get_z_distance(value)
+
+
 
 class StepResult(Enum):
     SUCCESS = 0

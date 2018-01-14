@@ -9,6 +9,7 @@ from mgmt.steps_base import Step, Context, CancleStep, StepResult, SyncStep
 from mgmt.steps_init import WaitForInitStep, InitStep
 from mgmt.steps_run import WaitForStartStep, DriveXToLoadPickup, DriveZToLoadPickup, EnableMagnetStep, \
     DriveZToTravelPosition
+from target_recognition.target_recognition import TargetRecognition
 from utils import log
 
 
@@ -27,6 +28,7 @@ class CoreProcess:
         self.context = Context()
         self.context.ui_interface = UIInterface()
         self.context.ic_interface = ICInterface()
+        self.context.target_recognition = TargetRecognition()
 
     def _init_steps(self):
         wait_for_init_step = WaitForInitStep(self.context)

@@ -70,6 +70,12 @@ class ICInterface:
         self.callback_once[self.CMD_END_DRIVE]\
             .append(callback)
 
+    def drive_jog(self, speed: int, direction: Direction):
+        payload = speed.to_bytes(1, byteorder='big')
+        payload.append(direction.value)
+
+        self.ic_com.send_msg(self.CMD_DRIVE_JOG, payload)
+
     def enable_magnet(self, direction: MagnetDirection):
         payload = b''
         payload.append(direction.value)
