@@ -1,7 +1,7 @@
 from threading import Event
 
 from mgmt.steps_base import Step, Context
-from utils import log
+from mgmt_utils import log
 
 
 class WaitForInitStep(Step):

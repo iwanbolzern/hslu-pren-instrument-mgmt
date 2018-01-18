@@ -5,8 +5,8 @@ import math
 from com.ic_interface import Direction, MagnetDirection
 from mgmt import mgmt_utils
 from mgmt.steps_base import Step, Context
-from utils import log
-from utils.config import Config
+from mgmt_utils import log
+from mgmt_utils.config import Config
 
 
 class WaitForStartStep(Step):

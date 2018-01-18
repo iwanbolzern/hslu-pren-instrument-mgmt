@@ -3,7 +3,7 @@ from enum import Enum
 
 import pickle
 
-from utils.singleton import Singleton
+from mgmt_utils.singleton import Singleton
 import argparse
 from pathlib import Path
 

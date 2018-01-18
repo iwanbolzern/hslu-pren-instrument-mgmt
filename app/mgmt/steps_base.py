@@ -6,7 +6,7 @@ from typing import List
 from com.ic_interface import ICInterface
 from com.ui_interface import UIInterface
 from mgmt import mgmt_utils
-from target_recognition.target_recognition import TargetRecognition
+from target_recognition import TargetRecognition
 
 
 class Context:
@@ -65,7 +65,7 @@ class Step:
 class SyncStep(Step):
 
     def __init__(self, context: Context, step_count_to_wait_for: int):
-        super(CancleStep, self).__init__(context)
+        super(SyncStep, self).__init__(context)
         self.step_count_to_wait_for = step_count_to_wait_for
         self.steps_done = 0
         self.wait_event = Event()
