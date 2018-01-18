@@ -40,6 +40,9 @@ class Config(metaclass=Singleton):
         self.adjust_speed = self.conf_dict['AdjustSpeed']
         self.adjust_offset_to_start_tele = self.conf_dict['AdjustDistanceToStartTele']
 
+        self.z_end_position = self.conf_dict['ZEndPosition']
+        self.z_position_to_drive_to_end = self.conf_dict['ZPositionToDriveToEnd']
+
         # do not use log.info(..) you will end in hell
         print("Started with config: {}".format(Config.FILE_PATH))
 

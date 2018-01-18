@@ -31,6 +31,12 @@ class UIInterface:
     def send_position_update(self, x_position, z_position):
         self.ui_com.send_msg('{}{},{}'.format(self.CMD_POSITION_FEEDBACK, x_position, z_position))
 
+    def send_end(self):
+        self.ui_com.send_msg('{}'.format(self.CMD_END_RUN))
+
+    def send_end_init(self):
+        self.ui_com.send_msg('{}'.format(self.CMD_END_INIT))
+
     def register_init_once(self, callback):
         self.callback[self.CMD_INIT].append(callback)
 

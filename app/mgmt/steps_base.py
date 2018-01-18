@@ -41,6 +41,7 @@ class Context:
 class StepResult(Enum):
     SUCCESS = 0
     SYNC = 1
+    END = 2
 
 
 class Step:
@@ -74,7 +75,6 @@ class SyncStep(Step):
         if self.steps_done < self.step_count_to_wait_for:
             return StepResult.SYNC
         self.steps_done = 0
-
 
 class CancleStep(Step):
 

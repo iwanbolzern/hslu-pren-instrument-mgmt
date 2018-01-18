@@ -29,6 +29,7 @@ class ICInterface:
     CMD_END_DRIVE = 9
     CMD_EMD_MOVE_TELE = 10
     CMD_POSITION_FEEDBACK = 11
+    CMD_END_RUN = 12
 
     def __init__(self):
         self.ic_com = ICCommunication()
@@ -81,6 +82,15 @@ class ICInterface:
         payload.append(direction.value)
 
         self.ic_com.send_msg(self.CMD_ENABLE_MAGNET, payload)
+
+    def drive_to_end_async(self, predicted_distance: int, speed: int, direction: Direction, callback):
+        payload = predicted_distance.to_bytes(2, byteorder='big')
+        payload += speed.to_bytes(1, byteorder='big')
+        payload.append(direction.value)
+
+        self.ic_com.send_msg(self.CMD_DRIVE_TO_END, payload)
+        self.callback_once[self.CMD_END_RUN] \
+            .append(callback)
 
     def _wait_for_ic_callback(self, cmd_id: int, timeout: float):
         thread_event = Event()

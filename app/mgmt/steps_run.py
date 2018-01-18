@@ -94,10 +94,10 @@ class DriveZToLoadPickup(Step):
             self.event.set()
 
 
-class EnableMagnetStep(Step):
+class EnforceMagnetStep(Step):
 
     def __init__(self, context: Context):
-        super(EnableMagnetStep, self).__init__(context)
+        super(EnforceMagnetStep, self).__init__(context)
         self.event = None
 
     def run(self):
@@ -201,7 +201,7 @@ class DriveZToUnloadPosition(Step):
 
         #drive tele
         self.event = Event()
-        self.context.ic_interface.move_tele_async(-self.context.z_position_on_target,
+        self.context.ic_interface.move_tele_async(self.context.z_position_on_target,
                                                   Direction.Forward,
                                                   lambda: self.event.set())
         self.event.wait()
@@ -210,4 +210,55 @@ class DriveZToUnloadPosition(Step):
         self.context.x_offset = mgmt_utils.get_x_offset(x_centroid)
         if math.abs(self.context.x_offset) < self.adjust_offset_to_start_tele:
             self.context.target_recognition.unregister_callback(self._unload_plain_interrupt)
+            self.event.set()
+
+class ReleaseMagnet(Step):
+
+    def __init__(self, context: Context):
+        super(ReleaseMagnet, self).__init__(context)
+        self.event = None
+
+    def run(self):
+        self.context.ic_interface.enable_magnet(MagnetDirection.Release)
+
+
+class DriveZToEndPosition(Step):
+
+    def __init__(self, context: Context):
+        super(DriveZToEndPosition, self).__init__(context)
+        self.event = None
+
+    def run(self):
+        # drive tele
+        self.event = Event()
+        self.context.ic_interface.move_tele_async(self.context.z_position_on_target -
+                                                  mgmt_utils.z_end_position,
+                                                  Direction.Backward,
+                                                  lambda: self.event.set())
+        self.event.wait()
+
+
+class DriveToEnd(Step):
+    def __init__(self, context: Context):
+        super(DriveToEnd, self).__init__(context)
+        self.event = None
+
+    def run(self):
+        # wait until tele is high enough
+        self.event = Event()
+        self.context.ic_interface.register_position_callback(self._position_update_received)
+        self.event.wait()
+
+        # drive to end
+        self.event = Event()
+        self.context.ic_interface.drive_to_end_async(100,
+                                                     mgmt_utils.drive_to_end_speed,
+                                                     Direction.Forward,
+                                                     lambda: self.event.set())
+        self.event.wait()
+        self.context.ui_interface.send_log()
+
+    def _position_update_received(self, x_position, z_position):
+        if z_position >= Config().z_position_to_drive_to_end:
+            self.context.ic_interface.unregister_position_callback(self._position_update_received)
             self.event.set()
