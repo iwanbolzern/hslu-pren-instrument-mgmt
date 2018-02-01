@@ -18,14 +18,18 @@ class WaitForStartStep(Step):
     def run(self):
         log.debug('WaitForStartStep started')
         self.event = Event()
-        self.context.ui_interface.register_start_once(lambda: self.event.set())
+        self.context.ui_interface.register_start_once(self.set_event)
         log.info('Waiting for start callback')
         self.event.wait()
         if not self.is_canceled:
             log.info('Start callback received')
 
+    def set_event(self):
+        self.event.set()
+
     def cancel(self):
         super(WaitForStartStep, self).cancel()
+        self.context.ui_interface.unregister_start(self.set_event)
         self.event.set()
 
 

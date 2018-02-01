@@ -115,7 +115,7 @@ class ICInterface:
             z_position = int.from_bytes(payload[2:3], 'big')
             return [x_position, z_position]
         else:
-            raise NotImplementedError()
+            return []
 
 
 

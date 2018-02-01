@@ -1,7 +1,10 @@
 from abc import abstractmethod
+from asyncio import Future
 from concurrent.futures import ThreadPoolExecutor
 from threading import Event
 from typing import List
+
+import functools
 
 from app.com.ic_interface import ICInterface
 from app.com.ui_interface import UIInterface
@@ -92,18 +95,19 @@ class CoreProcess:
 
     def start_process(self):
         for step in self.start_steps:
-            future = self.step_thread_pool.submit(step.run)
-            future.add_done_callback(lambda x: self._step_done_callback(step, x.result()))
+            future = self.step_thread_pool.submit(step.start)
+            future.add_done_callback(functools.partial(self._step_done_callback, step))
 
-    def _step_done_callback(self, step, result):
+    def _step_done_callback(self, step: Step, done_future: Future):
         if not step.is_canceled:
+            result = done_future.result()
             # do not start next steps if result is sync (SyncStep)
             if result == StepResult.SYNC:
                 return
             elif not result:
-                for step in step.next_steps:
-                    future = self.step_thread_pool.submit(step.run)
-                    future.add_done_callback(lambda x: self._step_done_callback(step, x.result()))
+                for next_step in step.next_steps:
+                    future = self.step_thread_pool.submit(next_step.start)
+                    future.add_done_callback(functools.partial(self._step_done_callback, next_step))
 
     def _set_start_steps(self, start_steps):
         self.start_steps = start_steps

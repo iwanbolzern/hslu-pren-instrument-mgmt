@@ -50,11 +50,14 @@ class Step:
         self.context = context
         self.next_steps = []
         self.is_canceled = False
-        self.load_present = False
 
     @abstractmethod
     def run(self):
         pass
+
+    def start(self):
+        self.is_canceled = False
+        self.run()
 
     def cancel(self):
         self.is_canceled = True

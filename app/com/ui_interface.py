@@ -40,10 +40,17 @@ class UIInterface:
     def register_init_once(self, callback):
         self.callback[self.CMD_INIT].append(callback)
 
+    def unregister_init_once(self, callback):
+        self.callback[self.CMD_INIT].remove(callback)
+
     def register_start_once(self, callback):
         self.callback[self.CMD_START].append(callback)
 
+    def unregister_start(self, callback):
+        self.callback[self.CMD_START].remove(callback)
+
     def ui_callback(self, cmd_id: int, payload: List[chr]):
+        print('ui_callback called')
         if cmd_id in self.callback:
             for callback in self.callback.pop(cmd_id):
                 callback()
