@@ -43,6 +43,7 @@ class CoreProcess:
         cancle_wait_for_init_step = CancleStep(self.context, [wait_for_init_step])
         # steps for run
         update_position_step = UpdatePositionStep(self.context)
+        cancel_update_position_step = CancleStep(self.context, [update_position_step])
         drive_x_to_load_pickup_step = DriveXToLoadPickup(self.context)
         drive_z_to_load_pickup_step = DriveZToLoadPickup(self.context)
         enforce_magnet_step = EnforceMagnetStep(self.context)
@@ -86,7 +87,8 @@ class CoreProcess:
         release_magnet.set_next_steps([drive_z_to_end_position,
                                        drive_to_end])
         drive_z_to_end_position.set_next_steps([end_sync_step])
-        drive_to_end.set_next_steps([end_sync_step])
+        drive_to_end.set_next_steps([cancel_update_position_step])
+        cancel_update_position_step.set_next_steps([end_sync_step])
         end_sync_step.set_next_steps([wait_for_start_step,
                                       wait_for_init_step])
 
@@ -96,7 +98,7 @@ class CoreProcess:
     def start_process(self):
         for step in self.start_steps:
             future = self.step_thread_pool.submit(step.start)
-            future.add_done_callback(functools.partial(self._step_done_callback, step))
+            future.add_done_callback(functools.partial(self._step_dotfne_callback, step))
 
     def _step_done_callback(self, step: Step, done_future: Future):
         if not step.is_canceled:

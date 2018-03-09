@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from enum import Enum
 from threading import Event
-from typing import List
+from typing import List, Callable
 
 from com.ic_interface import ICInterface
 from com.ui_interface import UIInterface
@@ -12,16 +12,33 @@ from target_recognition import TargetRecognition
 class Context:
     def __init__(self):
         # handles
-        self.ic_interface: ICInterface = None
-        self.ui_interface: UIInterface = None
-        self.target_recognition: TargetRecognition = None
+        self.ic_interface: ICInterface = ICInterface()
+        self.ui_interface: UIInterface = UIInterface()
+        self.target_recognition: TargetRecognition = TargetRecognition()
 
         # infos
-        self.x_position: int = None
-        self.z_position: int = None
+        self.x_position: int = 0
+        self.z_position: int = 0
 
         self._x_offset: int = None
         self._z_position_on_target = None
+
+        # register position callbacks
+        self.position_callbacks = []
+        self.ic_interface.register_position_callback(self.__position_update)
+
+    def __position_update(self, x_offset, z_offset):
+        self.x_position += x_offset
+        self.z_position += z_offset
+
+        for callback in self.position_callbacks:
+            callback(self.x_position, self.z_position)
+
+    def register_position_update(self, callback: Callable[[int, int], None]):
+        self.position_callbacks.append(callback)
+
+    def unregister_position_callback(self, callback: Callable[[int, int], None]):
+        self.position_callbacks.remove(callback)
 
     @property
     def z_position_on_target(self):

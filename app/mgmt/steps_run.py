@@ -41,13 +41,13 @@ class UpdatePositionStep(Step):
 
     def run(self):
         log.debug('UpdatePositionStep started')
-        self.context.ic_interface.register_position_callback(self._position_update_received)
+        self.context.register_position_callback(self.__position_update_received)
 
         #prevent step from end
         self.event = Event()
         self.event.wait()
 
-    def _position_update_received(self, x_position, z_position):
+    def __position_update_received(self, x_position, z_position):
         self.context.x_position = x_position
         self.context.z_position = z_position
         if self.context.load_present:
@@ -55,6 +55,7 @@ class UpdatePositionStep(Step):
 
     def cancel(self):
         super(UpdatePositionStep, self).cancel()
+        self.context.unregister_position_callback(self.__position_update_received)
         self.event.set()
 
 
@@ -82,7 +83,7 @@ class DriveZToLoadPickup(Step):
     def run(self):
         #wait to start of move tele
         self.event = Event()
-        self.context.ic_interface.register_position_callback(self._position_update_received)
+        self.context.register_position_callback(self.__position_update_received)
         self.event.wait()
 
         #drive tele
@@ -92,9 +93,9 @@ class DriveZToLoadPickup(Step):
                                                   lambda: self.event.set())
         self.event.wait()
 
-    def _position_update_received(self, x_position, z_position):
+    def __position_update_received(self, x_position, z_position):
         if x_position >= Config().x_position_to_start_load_pickup:
-            self.context.ic_interface.unregister_position_callback(self._position_update_received)
+            self.context.unregister_position_callback(self.__position_update_received)
             self.event.set()
 
 
@@ -107,16 +108,16 @@ class EnforceMagnetStep(Step):
     def run(self):
         # wait until magnet is near enough
         self.event = Event()
-        self.context.ic_interface.register_position_callback(self._position_update_received)
+        self.context.register_position_callback(self.__position_update_received)
         self.event.wait()
 
         #enable magnet
         self.context.ic_interface.enable_magnet(MagnetDirection.Enforce)
 
-    def _position_update_received(self, x_position, z_position):
+    def __position_update_received(self, x_position, z_position):
         if x_position >= Config().x_position_to_enable_magnet_load_pickup and \
                 z_position >= Config().z_position_to_enable_magnet_load_pickup:
-            self.context.ic_interface.unregister_position_callback(self._position_update_received)
+            self.context.unregister_position_callback(self.__position_update_received)
             self.event.set()
 
 
@@ -144,7 +145,7 @@ class DriveToUnloadPlainInterrupt(Step):
     def run(self):
         #wait until tele is high enough
         self.event = Event()
-        self.context.ic_interface.register_position_callback(self._position_update_received)
+        self.context.register_position_callback(self._position_update_received)
         self.event.wait()
 
         #drive jog
@@ -158,7 +159,7 @@ class DriveToUnloadPlainInterrupt(Step):
 
     def _position_update_received(self, x_position, z_position):
         if z_position >= Config().z_position_to_start_travel:
-            self.context.ic_interface.unregister_position_callback(self._position_update_received)
+            self.context.unregister_position_callback(self._position_update_received)
             self.event.set()
 
     def _unload_plain_interrupt(self, x_centroid, y_centroid):
@@ -250,7 +251,7 @@ class DriveToEnd(Step):
     def run(self):
         # wait until tele is high enough
         self.event = Event()
-        self.context.ic_interface.register_position_callback(self._position_update_received)
+        self.context.register_position_callback(self._position_update_received)
         self.event.wait()
 
         # drive to end
@@ -264,5 +265,5 @@ class DriveToEnd(Step):
 
     def _position_update_received(self, x_position, z_position):
         if z_position >= Config().z_position_to_drive_to_end:
-            self.context.ic_interface.unregister_position_callback(self._position_update_received)
+            self.context.unregister_position_callback(self._position_update_received)
             self.event.set()
