@@ -51,15 +51,12 @@ class ICCommunication:
     def _serial_handle(self):
         # init serial port
         self.serial = serial.Serial(
-            port='COM5',
+            port='COM7',
             baudrate=38400,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS,
             timeout=1)
-
-        while True:
-            self.serial.write(int(1).to_bytes(2, 'big'))
 
         while not self.stop_event.is_set():
             while not self.message_queue.empty():

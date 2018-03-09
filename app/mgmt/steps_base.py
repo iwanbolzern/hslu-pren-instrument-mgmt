@@ -17,6 +17,7 @@ class Context:
         self.target_recognition: TargetRecognition = TargetRecognition()
 
         # infos
+        self.load_present = True
         self.x_position: int = 0
         self.z_position: int = 0
 

@@ -6,12 +6,12 @@ from typing import List, Callable
 from app.com.ic_communication import ICCommunication
 
 class Direction(Enum):
-    Forward = chr(0)
-    Backward = chr(1)
+    Forward = 0
+    Backward = 1
 
 class MagnetDirection(Enum):
-    Enforce = chr(1)
-    Release = chr(0)
+    Enforce = 1
+    Release = 0
 
 class ICInterface:
 
@@ -56,7 +56,7 @@ class ICInterface:
 
     def move_tele_async(self, distance: int, direction: Direction, callback):
         payload = distance.to_bytes(2, byteorder='big')
-        payload.append(direction.value)
+        payload += direction.value.to_bytes(1, byteorder='big')
 
         self.ic_com.send_msg(self.CMD_MOVE_TELE, payload)
         self.callback_once[self.CMD_EMD_MOVE_TELE].append(callback)
@@ -64,8 +64,8 @@ class ICInterface:
     def drive_distance_async(self, distance: int, speed: chr,
                              direction: Direction, callback):
         payload = distance.to_bytes(2, byteorder='big')
-        payload.append(speed)
-        payload.append(direction.value)
+        payload += speed.to_bytes(1, byteorder='big')
+        payload += direction.value.to_bytes(1, byteorder='big')
 
         self.ic_com.send_msg(self.CMD_DRIVE_DISTANCE, payload)
         self.callback_once[self.CMD_END_DRIVE]\
@@ -73,20 +73,19 @@ class ICInterface:
 
     def drive_jog(self, speed: int, direction: Direction):
         payload = speed.to_bytes(1, byteorder='big')
-        payload.append(direction.value)
+        payload += direction.value.to_bytes(1, byteorder='big')
 
         self.ic_com.send_msg(self.CMD_DRIVE_JOG, payload)
 
     def enable_magnet(self, direction: MagnetDirection):
-        payload = b''
-        payload.append(direction.value)
+        payload = direction.value.to_bytes(1, byteorder='big')
 
         self.ic_com.send_msg(self.CMD_ENABLE_MAGNET, payload)
 
     def drive_to_end_async(self, predicted_distance: int, speed: int, direction: Direction, callback):
         payload = predicted_distance.to_bytes(2, byteorder='big')
         payload += speed.to_bytes(1, byteorder='big')
-        payload.append(direction.value)
+        payload += direction.value.to_bytes(1, byteorder='big')
 
         self.ic_com.send_msg(self.CMD_DRIVE_TO_END, payload)
         self.callback_once[self.CMD_END_RUN] \
@@ -111,8 +110,8 @@ class ICInterface:
 
     def _extract_parameters(self, cmd_id: int, payload: bytes):
         if cmd_id == self.CMD_POSITION_FEEDBACK:
-            x_position = int.from_bytes(payload[:1], 'big')
-            z_position = int.from_bytes(payload[2:3], 'big')
+            x_position = int.from_bytes(payload[:2], 'big')
+            z_position = int.from_bytes(payload[2:4], 'big')
             return [x_position, z_position]
         else:
             return []
