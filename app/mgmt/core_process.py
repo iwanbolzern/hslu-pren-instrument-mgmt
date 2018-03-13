@@ -30,9 +30,6 @@ class CoreProcess:
 
     def _create_context(self):
         self.context = Context()
-        self.context.ui_interface = UIInterface()
-        self.context.ic_interface = ICInterface()
-        self.context.target_recognition = TargetRecognition()
 
     def _init_steps(self):
         wait_for_init_step = WaitForInitStep(self.context)
