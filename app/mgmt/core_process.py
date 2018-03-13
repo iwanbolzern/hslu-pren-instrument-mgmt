@@ -6,8 +6,8 @@ from typing import List
 
 import functools
 
-from app.com.ic_interface import ICInterface
-from app.com.ui_interface import UIInterface
+from com.ic_interface import ICInterface
+from com.ui_interface import UIInterface
 from mgmt.steps_base import Step, Context, CancleStep, StepResult, SyncStep
 from mgmt.steps_init import WaitForInitStep, InitStep
 from mgmt.steps_run import WaitForStartStep, DriveXToLoadPickup, DriveZToLoadPickup, EnforceMagnetStep, \
