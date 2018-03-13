@@ -51,7 +51,7 @@ class ICCommunication:
     def _serial_handle(self):
         # init serial port
         self.serial = serial.Serial(
-            port='COM7',
+            port='/dev/serial0',
             baudrate=38400,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,

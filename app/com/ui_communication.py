@@ -18,7 +18,7 @@ class UICommunication:
         self.callbacks = []
         self.callback_thread_pool = ThreadPoolExecutor()
 
-    def start(self, ip_address: str='', port: int=5006):
+    def start(self, ip_address: str='0.0.0.0', port: int=50006):
         self.stop()
 
         # start listen
@@ -56,6 +56,7 @@ class UICommunication:
 
     def _listen(self, ip_address: str, port: int):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.settimeout(10)
         self.server_socket.bind((ip_address, port))
         self.server_socket.listen(5)  # defines max connect requests

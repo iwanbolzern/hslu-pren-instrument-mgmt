@@ -12,16 +12,16 @@ from target_recognition import TargetRecognition
 class Context:
     def __init__(self):
         # handles
-        self.ic_interface: ICInterface = ICInterface()
-        self.ui_interface: UIInterface = UIInterface()
-        self.target_recognition: TargetRecognition = TargetRecognition()
+        self.ic_interface = ICInterface()
+        self.ui_interface = UIInterface()
+        self.target_recognition = TargetRecognition()
 
         # infos
         self.load_present = True
-        self.x_position: int = 0
-        self.z_position: int = 0
+        self.x_position = 0
+        self.z_position = 0
 
-        self._x_offset: int = None
+        self._x_offset = None
         self._z_position_on_target = None
 
         # register position callbacks
