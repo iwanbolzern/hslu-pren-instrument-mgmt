@@ -3,7 +3,7 @@ from enum import Enum
 from threading import Event
 from typing import List, Callable
 
-from app.com.ic_communication import ICCommunication
+from com.ic_communication import ICCommunication
 
 class Direction(Enum):
     Forward = 0

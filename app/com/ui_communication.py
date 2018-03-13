@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
 from typing import List, Callable
 
-from app.mgmt_utils.generic import Generic
+from mgmt_utils.generic import Generic
 
 
 class UICommunication:
