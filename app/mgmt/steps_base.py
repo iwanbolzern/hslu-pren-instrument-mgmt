@@ -35,7 +35,7 @@ class Context:
         for callback in self.position_callbacks:
             callback(self.x_position, self.z_position)
 
-    def register_position_update(self, callback: Callable[[int, int], None]):
+    def register_position_callback(self, callback: Callable[[int, int], None]):
         self.position_callbacks.append(callback)
 
     def unregister_position_callback(self, callback: Callable[[int, int], None]):
