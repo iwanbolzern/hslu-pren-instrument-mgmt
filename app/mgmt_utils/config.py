@@ -48,11 +48,11 @@ class Config(metaclass=Singleton):
         print("Started with config: {}".format(Config.FILE_PATH))
 
     def save_config(self):
-        with open(Config.FILE_PATH, 'w') as f:
+        with open(Config.FILE_PATH, 'w', encoding='utf-8') as f:
             json.dump(self.__dict__, f, indent=2)
 
     def load_config(self):
-        with open(Config.FILE_PATH, 'rb') as f:
+        with open(Config.FILE_PATH, 'rb', encoding='utf-8') as f:
             self.__dict__ = json.load(f)
 
 
