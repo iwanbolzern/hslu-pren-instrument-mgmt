@@ -98,7 +98,7 @@ class CoreProcess:
     def start_process(self):
         for step in self.start_steps:
             future = self.step_thread_pool.submit(step.start)
-            future.add_done_callback(functools.partial(self._step_dotfne_callback, step))
+            future.add_done_callback(functools.partial(self._step_done_callback, step))
 
     def _step_done_callback(self, step: Step, done_future: Future):
         if not step.is_canceled:
