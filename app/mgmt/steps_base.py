@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from enum import Enum
-from threading import Event
+from threading import Event, RLock
 from typing import List, Callable
 
 from com.ic_interface import ICInterface
@@ -76,7 +76,7 @@ class Step:
 
     def start(self):
         self.is_canceled = False
-        self.run()
+        return self.run()
 
     def cancel(self):
         self.is_canceled = True
@@ -90,14 +90,17 @@ class SyncStep(Step):
         super(SyncStep, self).__init__(context)
         self.step_count_to_wait_for = step_count_to_wait_for
         self.steps_done = 0
-        self.wait_event = Event()
+        self.lock = RLock()
 
     def run(self):
+        self.lock.acquire(True)
         self.steps_done += 1
-        log.debug('SyncStep run called: steps_done ' + self.steps_done)
+        log.debug('SyncStep run called: steps_done ' + str(self.steps_done))
         if self.steps_done < self.step_count_to_wait_for:
+            self.lock.release()
             return StepResult.SYNC
         self.steps_done = 0
+        self.lock.release()
         log.debug('SyncStep done')
 
 class CancleStep(Step):
@@ -107,6 +110,6 @@ class CancleStep(Step):
         self.steps_to_cancel = steps_to_cancle
 
     def run(self):
-        log.debug('CancelStep run called: step_to_cancel_count ' + len(self.steps_to_cancel))
+        log.debug('CancelStep run called: step_to_cancel_count ' + str(len(self.steps_to_cancel)))
         for step in self.steps_to_cancel:
             step.cancel()

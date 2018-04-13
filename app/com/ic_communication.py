@@ -51,7 +51,8 @@ class ICCommunication:
     def _serial_handle(self):
         # init serial port
         self.serial = serial.Serial(
-            port='/dev/serial0',
+            #port='/dev/serial0',
+            port='COM5',
             baudrate=38400,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
@@ -61,10 +62,10 @@ class ICCommunication:
         while not self.stop_event.is_set():
             while not self.message_queue.empty():
                 msg = self.message_queue.get()
-                self.serial.write(len(msg).to_bytes(2, 'big') + msg)
+                self.serial.write(len(msg).to_bytes(1, 'big') + msg)
 
-            while self.serial.inWaiting() >= 2:
-                length = self.serial.read(2)
+            while self.serial.inWaiting() >= 1:
+                length = self.serial.read(1)
                 length = int.from_bytes(length, byteorder='big')
                 payload = self.serial.read(length)
                 self._on_receive(payload)
