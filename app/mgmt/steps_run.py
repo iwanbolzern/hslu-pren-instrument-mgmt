@@ -46,6 +46,7 @@ class UpdatePositionStep(Step):
         #prevent step from end
         self.event = Event()
         self.event.wait()
+        log.debug('UpdatePositionStep done')
 
     def __position_update_received(self, x_position, z_position):
         self.context.x_position = x_position
@@ -66,12 +67,14 @@ class DriveXToLoadPickup(Step):
         self.event = None
 
     def run(self):
+        log.debug('DriveXToLoadPickup run called')
         self.event = Event()
         self.context.ic_interface.drive_distance_async(Config().x_distance_to_load_pickup,
                                                        Config().x_speed_to_load_pickup,
                                                        Direction.Forward,
                                                        lambda: self.event.set())
         self.event.wait()
+        log.debug('DriveXToLoadPickup done')
 
 
 class DriveZToLoadPickup(Step):
@@ -81,17 +84,20 @@ class DriveZToLoadPickup(Step):
         self.event = None
 
     def run(self):
+        log.debug('DriveZToLoadPickup run called')
         #wait to start of move tele
         self.event = Event()
         self.context.register_position_callback(self.__position_update_received)
         self.event.wait()
 
+        log.debug('DriveZToLoadPickup start move tele')
         #drive tele
         self.event = Event()
         self.context.ic_interface.move_tele_async(Config().z_distance_to_load_pickup,
                                                   Direction.Forward,
                                                   lambda: self.event.set())
         self.event.wait()
+        log.debug('DriveZToLoadPickup done')
 
     def __position_update_received(self, x_position, z_position):
         if x_position >= Config().x_position_to_start_load_pickup:
@@ -106,13 +112,16 @@ class EnforceMagnetStep(Step):
         self.event = None
 
     def run(self):
+        log.debug('EnforceMagnetStep run called')
         # wait until magnet is near enough
         self.event = Event()
         self.context.register_position_callback(self.__position_update_received)
         self.event.wait()
 
+        log.debug('EnforceMagnetStep start enforce magnet')
         #enable magnet
         self.context.ic_interface.enable_magnet(MagnetDirection.Enforce)
+        log.debug('EnforceMagnetStep done')
 
     def __position_update_received(self, x_position, z_position):
         if x_position >= Config().x_position_to_enable_magnet_load_pickup and \
@@ -128,12 +137,14 @@ class DriveZToTravelPosition(Step):
         self.event = None
 
     def run(self):
+        log.debug('DriveZToTravelPosition run called')
         #drive tele
         self.event = Event()
         self.context.ic_interface.move_tele_async(Config().z_travel_position,
                                                   Direction.Backward,
                                                   lambda: self.event.set())
         self.event.wait()
+        log.debug('DriveZToTravelPosition done')
 
 
 class DriveToUnloadPlainInterrupt(Step):
@@ -143,11 +154,13 @@ class DriveToUnloadPlainInterrupt(Step):
         self.event = None
 
     def run(self):
+        log.debug('DriveToUnloadPlainInterrupt run called')
         #wait until tele is high enough
         self.event = Event()
         self.context.register_position_callback(self._position_update_received)
         self.event.wait()
 
+        log.debug('DriveToUnloadPlainInterrupt start drive')
         #drive jog
         self.context.ic_interface.drive_jog(Config().travel_speed, Direction.Forward)
 
@@ -156,6 +169,8 @@ class DriveToUnloadPlainInterrupt(Step):
         self.context.target_recognition.register_callback(self._unload_plain_interrupt)
         self.context.target_recognition.start()
         self.event.wait()
+
+        log.debug('DriveToUnloadPlainInterrupt done')
 
     def _position_update_received(self, x_position, z_position):
         if z_position >= Config().z_position_to_start_travel:
@@ -176,11 +191,13 @@ class AdjustXPosition(Step):
         self.event = None
 
     def run(self):
+        log.debug('AdjustXPosition run called')
         # register image recognition callback
         self.context.target_recognition.register_callback(self._unload_plain_interrupt)
         self.context.target_recognition.start()
 
         while math.abs(self.context.x_offset) > Config().max_adjust_offset:
+            log.debug('AdjustXPosition offset procedure started with offset adjustment of: ' + self.context.x_offset)
             self.event = Event()
             direction = Direction.Forward if self.context.x_offset > 0 else Direction.Backward
             self.context.ic_interface.drive_distance_async(math.abs(self.context.x_offset),
@@ -188,8 +205,11 @@ class AdjustXPosition(Step):
                                                            lambda: self.event.set())
             self.event.wait()
 
+        log.debug('AdjustXPosition done')
+
     def _unload_plain_interrupt(self, x_centroid, y_centroid):
         self.context.x_offset = mgmt_utils.get_x_offset(x_centroid)
+
 
 class DriveZToUnloadPosition(Step):
 
@@ -198,18 +218,21 @@ class DriveZToUnloadPosition(Step):
         self.event = None
 
     def run(self):
+        log.debug('DriveZToUnloadPosition run called')
         # register image recognition callback and wait until plain is near enough
         self.event = Event()
         self.context.target_recognition.register_callback(self._unload_plain_interrupt)
         self.context.target_recognition.start()
         self.event.wait()
 
+        log.debug('DriveZToUnloadPosition move tele started')
         #drive tele
         self.event = Event()
         self.context.ic_interface.move_tele_async(self.context.z_position_on_target,
                                                   Direction.Forward,
                                                   lambda: self.event.set())
         self.event.wait()
+        log.debug('DriveZToUnloadPosition done')
 
     def _unload_plain_interrupt(self, x_centroid, y_centroid):
         self.context.x_offset = mgmt_utils.get_x_offset(x_centroid)
@@ -224,7 +247,9 @@ class ReleaseMagnet(Step):
         self.event = None
 
     def run(self):
+        log.debug('ReleaseMagnet run called')
         self.context.ic_interface.enable_magnet(MagnetDirection.Release)
+        log.debug('ReleaseMagnet done')
 
 
 class DriveZToEndPosition(Step):
@@ -234,6 +259,7 @@ class DriveZToEndPosition(Step):
         self.event = None
 
     def run(self):
+        log.debug('DriveZToEndPosition run called')
         # drive tele
         self.event = Event()
         self.context.ic_interface.move_tele_async(self.context.z_position_on_target -
@@ -241,6 +267,7 @@ class DriveZToEndPosition(Step):
                                                   Direction.Backward,
                                                   lambda: self.event.set())
         self.event.wait()
+        log.debug('DriveZToEndPosition done')
 
 
 class DriveToEnd(Step):
@@ -249,11 +276,13 @@ class DriveToEnd(Step):
         self.event = None
 
     def run(self):
+        log.debug('DriveToEnd run called')
         # wait until tele is high enough
         self.event = Event()
         self.context.register_position_callback(self._position_update_received)
         self.event.wait()
 
+        log.debug('DriveToEnd start drive')
         # drive to end
         self.event = Event()
         self.context.ic_interface.drive_to_end_async(100,
@@ -261,7 +290,7 @@ class DriveToEnd(Step):
                                                      Direction.Forward,
                                                      lambda: self.event.set())
         self.event.wait()
-        self.context.ui_interface.send_log()
+        log.debug('DriveToEnd done')
 
     def _position_update_received(self, x_position, z_position):
         if z_position >= Config().z_position_to_drive_to_end:

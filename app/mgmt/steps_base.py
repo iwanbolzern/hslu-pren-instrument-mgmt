@@ -7,6 +7,7 @@ from com.ic_interface import ICInterface
 from com.ui_interface import UIInterface
 from mgmt import mgmt_utils
 from target_recognition import TargetRecognition
+from mgmt_utils import log
 
 
 class Context:
@@ -93,9 +94,11 @@ class SyncStep(Step):
 
     def run(self):
         self.steps_done += 1
+        log.debug('SyncStep run called: steps_done ' + self.steps_done)
         if self.steps_done < self.step_count_to_wait_for:
             return StepResult.SYNC
         self.steps_done = 0
+        log.debug('SyncStep done')
 
 class CancleStep(Step):
 
@@ -104,5 +107,6 @@ class CancleStep(Step):
         self.steps_to_cancel = steps_to_cancle
 
     def run(self):
+        log.debug('CancelStep run called: step_to_cancel_count ' + len(self.steps_to_cancel))
         for step in self.steps_to_cancel:
             step.cancel()
