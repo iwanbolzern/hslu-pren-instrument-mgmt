@@ -52,7 +52,7 @@ class Config(metaclass=Singleton):
             json.dump(self.__dict__, f, indent=2)
 
     def load_config(self):
-        with open(Config.FILE_PATH, 'rb', encoding='utf-8') as f:
+        with open(Config.FILE_PATH, 'r', encoding='utf-8') as f:
             self.__dict__ = json.load(f)
 
 
