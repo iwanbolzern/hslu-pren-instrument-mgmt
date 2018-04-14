@@ -12,5 +12,7 @@
   "adjust_speed": 100,
   "adjust_offset_to_start_tele": 50,
   "z_end_position": 0,
-  "z_position_to_drive_to_end": 40
+  "z_position_to_drive_to_end": 200,
+  "drive_to_end_speed": 100,
+  "x_end_position_abs": 3400
 }

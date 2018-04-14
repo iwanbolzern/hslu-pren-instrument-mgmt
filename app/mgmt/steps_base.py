@@ -5,7 +5,7 @@ from typing import List, Callable
 
 from com.ic_interface import ICInterface
 from com.ui_interface import UIInterface
-from mgmt import position_callculation
+from mgmt import pos_callculation
 from target_recognition import TargetRecognition
 from mgmt_utils import log
 
@@ -34,8 +34,8 @@ class Context:
     def __position_update(self, x_offset, z_offset):
         self.x_position_rel += x_offset
         self.z_position_rel += z_offset
-        self.x_position_abs = position_callculation.calc_x_abs(self.x_position_rel)
-        self.z_position_abs = position_callculation.calc_z_abs(self.x_position_rel, self.z_position_rel)
+        self.x_position_abs = pos_callculation.calc_x_abs(self.x_position_rel)
+        self.z_position_abs = pos_callculation.calc_z_abs(self.x_position_rel, self.z_position_rel)
 
         for callback in self.position_callbacks:
             callback(self.x_position_abs, self.z_position_abs)
@@ -52,16 +52,16 @@ class Context:
 
     @property
     def rel_x_offset(self):
-        return position_callculation.calc_x_rel(self.x_position_abs, self.__abs_x_offset)
+        return pos_callculation.calc_x_rel(self.x_position_abs, self.__abs_x_offset)
 
-    @property
+    @property.setter
     def abs_x_offset(self, value):
         self.__abs_x_offset = value
-        self.__z_position_on_target = position_callculation.calc_z_abs(self.z_position_rel + self.rel_x_offset,
-                                                                       self.z_position_rel)
+        self.__z_position_on_target = pos_callculation.calc_z_abs(self.z_position_rel + self.rel_x_offset,
+                                                                  self.z_position_rel)
 
-    @abs_x_offset.setter
-    def abs_x_offset(self, value):
+    @abs_x_offset
+    def abs_x_offset(self):
         return self.__abs_x_offset
 
 

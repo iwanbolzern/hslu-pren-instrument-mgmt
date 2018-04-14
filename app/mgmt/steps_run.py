@@ -3,7 +3,7 @@ from threading import Event
 import math
 
 from com.ic_interface import Direction, MagnetDirection
-from mgmt import mgmt_utils
+from mgmt import pos_callculation
 from mgmt.steps_base import Step, Context
 from mgmt_utils import log
 from mgmt_utils.config import Config
@@ -178,7 +178,7 @@ class DriveToUnloadPlainInterrupt(Step):
             self.event.set()
 
     def _unload_plain_interrupt(self, x_centroid, y_centroid):
-        self.context.rel_x_offset = mgmt_utils.get_x_offset(x_centroid)
+        self.context.abs_x_offset = pos_callculation.calc_abs_x_offset_from_centroid(x_centroid)
         self.context.target_recognition.unregister_callback(self._unload_plain_interrupt)
         self.context.target_recognition.stop()
         self.event.set()
@@ -196,7 +196,7 @@ class AdjustXPosition(Step):
         self.context.target_recognition.register_callback(self._unload_plain_interrupt)
         self.context.target_recognition.start()
 
-        while math.abs(self.context.rel_x_offset) > Config().max_adjust_offset:
+        while math.abs(self.context.abs_x_offset) > Config().max_adjust_offset:
             log.debug('AdjustXPosition offset procedure started with offset adjustment of: ' + self.context.x_offset)
             self.event = Event()
             direction = Direction.Forward if self.context.rel_x_offset > 0 else Direction.Backward
@@ -205,10 +205,13 @@ class AdjustXPosition(Step):
                                                            lambda: self.event.set())
             self.event.wait()
 
+        self.context.target_recognition.unregister_callback(self._unload_plain_interrupt)
+        self.context.target_recognition.stop()
+
         log.debug('AdjustXPosition done')
 
     def _unload_plain_interrupt(self, x_centroid, y_centroid):
-        self.context.rel_x_offset = mgmt_utils.get_x_offset(x_centroid)
+        self.context.abs_x_offset = pos_callculation.calc_abs_x_offset_from_centroid(x_centroid)
 
 
 class DriveZToUnloadPosition(Step):
@@ -235,10 +238,11 @@ class DriveZToUnloadPosition(Step):
         log.debug('DriveZToUnloadPosition done')
 
     def _unload_plain_interrupt(self, x_centroid, y_centroid):
-        self.context.rel_x_offset = mgmt_utils.get_x_offset(x_centroid)
-        if math.abs(self.context.rel_x_offset) < self.adjust_offset_to_start_tele:
+        self.context.abs_x_offset = pos_callculation.calc_abs_x_offset_from_centroid(x_centroid)
+        if math.abs(self.context.abs_x_offset) < self.adjust_offset_to_start_tele:
             self.context.target_recognition.unregister_callback(self._unload_plain_interrupt)
             self.event.set()
+
 
 class ReleaseMagnet(Step):
 
@@ -262,8 +266,7 @@ class DriveZToEndPosition(Step):
         log.debug('DriveZToEndPosition run called')
         # drive tele
         self.event = Event()
-        self.context.ic_interface.move_tele_async(self.context.z_position_on_target -
-                                                  mgmt_utils.z_end_position,
+        self.context.ic_interface.move_tele_async(self.context.z_position_rel,
                                                   Direction.Backward,
                                                   lambda: self.event.set())
         self.event.wait()
@@ -285,8 +288,10 @@ class DriveToEnd(Step):
         log.debug('DriveToEnd start drive')
         # drive to end
         self.event = Event()
-        self.context.ic_interface.drive_to_end_async(100,
-                                                     mgmt_utils.drive_to_end_speed,
+        remaining_distance = pos_callculation.calc_x_rel(self.context.x_position_abs,
+                                                         Config.x_end_position_abs - self.context.x_position_abs)
+        self.context.ic_interface.drive_to_end_async(remaining_distance,
+                                                     Config.drive_to_end_speed,
                                                      Direction.Forward,
                                                      lambda: self.event.set())
         self.event.wait()

@@ -41,6 +41,8 @@ class Config(metaclass=Singleton):
 
         self.z_end_position = None
         self.z_position_to_drive_to_end = None
+        self.drive_to_end_speed = None
+        self.x_end_position_abs = None
 
         self.load_config()
 

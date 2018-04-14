@@ -21,3 +21,7 @@ def calc_x_rel(x_abs, x_offset):
     :return: relative x to drive to get to new absolute x position
     """
     return x_abs  # TODO: return f^-1(x_abs+x_offset) - f^-1(x_abs), f(x) := calc_x_abs
+
+
+def calc_abs_x_offset_from_centroid(centroid: int):
+    return 300 - centroid
