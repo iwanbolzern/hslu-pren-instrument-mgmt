@@ -24,4 +24,4 @@ def calc_x_rel(x_abs, x_offset):
 
 
 def calc_abs_x_offset_from_centroid(centroid: int):
-    return 300 - centroid
+    return 310 - centroid
