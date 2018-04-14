@@ -5,7 +5,7 @@ from typing import List, Callable
 
 from com.ic_interface import ICInterface
 from com.ui_interface import UIInterface
-from mgmt import mgmt_utils
+from mgmt import position_callculation
 from target_recognition import TargetRecognition
 from mgmt_utils import log
 
@@ -19,22 +19,26 @@ class Context:
 
         # infos
         self.load_present = True
-        self.x_position = 0
-        self.z_position = 0
+        self.x_position_rel = 0
+        self.z_position_rel = 0
+        self.x_position_abs = 0
+        self.z_position_abs = 0
 
-        self._x_offset = None
-        self._z_position_on_target = None
+        self.__abs_x_offset = None
+        self.__z_position_on_target = None
 
         # register position callbacks
         self.position_callbacks = []
         self.ic_interface.register_position_callback(self.__position_update)
 
     def __position_update(self, x_offset, z_offset):
-        self.x_position += x_offset
-        self.z_position += z_offset
+        self.x_position_rel += x_offset
+        self.z_position_rel += z_offset
+        self.x_position_abs = position_callculation.calc_x_abs(self.x_position_rel)
+        self.z_position_abs = position_callculation.calc_z_abs(self.x_position_rel, self.z_position_rel)
 
         for callback in self.position_callbacks:
-            callback(self.x_position, self.z_position)
+            callback(self.x_position_abs, self.z_position_abs)
 
     def register_position_callback(self, callback: Callable[[int, int], None]):
         self.position_callbacks.append(callback)
@@ -44,17 +48,21 @@ class Context:
 
     @property
     def z_position_on_target(self):
-        return self._z_position_on_target
+        return self.__z_position_on_target
 
     @property
-    def x_offset(self):
-        return self._x_offset
+    def rel_x_offset(self):
+        return position_callculation.calc_x_rel(self.x_position_abs, self.__abs_x_offset)
 
-    @x_offset.setter
-    def x_offset(self, value):
-        self._x_offset = value
-        self._z_position_on_target = mgmt_utils.get_z_distance(value)
+    @property
+    def abs_x_offset(self, value):
+        self.__abs_x_offset = value
+        self.__z_position_on_target = position_callculation.calc_z_abs(self.z_position_rel + self.rel_x_offset,
+                                                                       self.z_position_rel)
 
+    @abs_x_offset.setter
+    def abs_x_offset(self, value):
+        return self.__abs_x_offset
 
 
 class StepResult(Enum):

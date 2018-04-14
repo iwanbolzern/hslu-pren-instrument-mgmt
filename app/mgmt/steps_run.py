@@ -178,7 +178,7 @@ class DriveToUnloadPlainInterrupt(Step):
             self.event.set()
 
     def _unload_plain_interrupt(self, x_centroid, y_centroid):
-        self.context.x_offset = mgmt_utils.get_x_offset(x_centroid)
+        self.context.rel_x_offset = mgmt_utils.get_x_offset(x_centroid)
         self.context.target_recognition.unregister_callback(self._unload_plain_interrupt)
         self.context.target_recognition.stop()
         self.event.set()
@@ -196,11 +196,11 @@ class AdjustXPosition(Step):
         self.context.target_recognition.register_callback(self._unload_plain_interrupt)
         self.context.target_recognition.start()
 
-        while math.abs(self.context.x_offset) > Config().max_adjust_offset:
+        while math.abs(self.context.rel_x_offset) > Config().max_adjust_offset:
             log.debug('AdjustXPosition offset procedure started with offset adjustment of: ' + self.context.x_offset)
             self.event = Event()
-            direction = Direction.Forward if self.context.x_offset > 0 else Direction.Backward
-            self.context.ic_interface.drive_distance_async(math.abs(self.context.x_offset),
+            direction = Direction.Forward if self.context.rel_x_offset > 0 else Direction.Backward
+            self.context.ic_interface.drive_distance_async(math.abs(self.context.rel_x_offset),
                                                            Config().adjust_speed, direction,
                                                            lambda: self.event.set())
             self.event.wait()
@@ -208,7 +208,7 @@ class AdjustXPosition(Step):
         log.debug('AdjustXPosition done')
 
     def _unload_plain_interrupt(self, x_centroid, y_centroid):
-        self.context.x_offset = mgmt_utils.get_x_offset(x_centroid)
+        self.context.rel_x_offset = mgmt_utils.get_x_offset(x_centroid)
 
 
 class DriveZToUnloadPosition(Step):
@@ -235,8 +235,8 @@ class DriveZToUnloadPosition(Step):
         log.debug('DriveZToUnloadPosition done')
 
     def _unload_plain_interrupt(self, x_centroid, y_centroid):
-        self.context.x_offset = mgmt_utils.get_x_offset(x_centroid)
-        if math.abs(self.context.x_offset) < self.adjust_offset_to_start_tele:
+        self.context.rel_x_offset = mgmt_utils.get_x_offset(x_centroid)
+        if math.abs(self.context.rel_x_offset) < self.adjust_offset_to_start_tele:
             self.context.target_recognition.unregister_callback(self._unload_plain_interrupt)
             self.event.set()
 

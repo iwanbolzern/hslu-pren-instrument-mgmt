@@ -110,8 +110,8 @@ class ICInterface:
 
     def _extract_parameters(self, cmd_id: int, payload: bytes):
         if cmd_id == self.CMD_POSITION_FEEDBACK:
-            x_position = int.from_bytes(payload[:2], 'big')
-            z_position = int.from_bytes(payload[2:4], 'big')
+            x_position = int.from_bytes(payload[:1], 'big')
+            z_position = int.from_bytes(payload[1:2], 'big')
             return [x_position, z_position]
         else:
             return []
