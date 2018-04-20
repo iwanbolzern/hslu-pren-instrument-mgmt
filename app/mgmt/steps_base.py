@@ -54,15 +54,15 @@ class Context:
     def rel_x_offset(self):
         return pos_callculation.calc_x_rel(self.x_position_abs, self.__abs_x_offset)
 
-    @property.setter
+    @property
+    def abs_x_offset(self):
+        return self.__abs_x_offset
+
+    @abs_x_offset.setter
     def abs_x_offset(self, value):
         self.__abs_x_offset = value
         self.__z_position_on_target = pos_callculation.calc_z_abs(self.z_position_rel + self.rel_x_offset,
                                                                   self.z_position_rel)
-
-    @abs_x_offset
-    def abs_x_offset(self):
-        return self.__abs_x_offset
 
 
 class StepResult(Enum):
