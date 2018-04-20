@@ -6,6 +6,9 @@ from typing import List, Callable
 
 import serial
 
+from mgmt_utils import log
+
+
 class ICCommunication:
 
     def __init__(self):
@@ -67,7 +70,13 @@ class ICCommunication:
             while self.serial.inWaiting() >= 1:
                 length = self.serial.read(1)
                 length = int.from_bytes(length, byteorder='big')
+                if length > 0:
+                    log.warn('Received length zero from IC')
+                    continue
                 payload = self.serial.read(length)
+                if len(payload) != length:
+                    log.warn('Received payload from IC has not specified length')
+                    continue
                 self._on_receive(payload)
 
             time.sleep(0.1)
