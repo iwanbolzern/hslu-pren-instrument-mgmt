@@ -70,7 +70,7 @@ class ICCommunication:
             while self.serial.inWaiting() >= 1:
                 length = self.serial.read(1)
                 length = int.from_bytes(length, byteorder='big')
-                if length > 0:
+                if length <= 0:
                     log.warn('Received length zero from IC')
                     continue
                 payload = self.serial.read(length)

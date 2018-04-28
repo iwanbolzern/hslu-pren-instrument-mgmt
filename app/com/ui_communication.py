@@ -18,7 +18,7 @@ class UICommunication:
         self.callbacks = []
         self.callback_thread_pool = ThreadPoolExecutor()
 
-    def start(self, ip_address: str='0.0.0.0', port: int=50006):
+    def start(self, ip_address: str='0.0.0.0', port: int=5006):
         self.stop()
 
         # start listen
