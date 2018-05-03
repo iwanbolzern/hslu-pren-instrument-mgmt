@@ -2,7 +2,7 @@ from threading import Event
 
 import math
 
-from com.ic_interface import Direction, MagnetDirection
+from com.ic_interface import Direction, MagnetDirection, DirectionTele
 from mgmt import pos_callculation
 from mgmt.steps_base import Step, Context
 from mgmt_utils import log
@@ -49,8 +49,6 @@ class UpdatePositionStep(Step):
         log.debug('UpdatePositionStep done')
 
     def __position_update_received(self, x_position, z_position):
-        self.context.x_position = x_position
-        self.context.z_position = z_position
         if self.context.load_present:
             self.context.ui_interface.send_position_update(x_position, z_position)
 
@@ -94,7 +92,7 @@ class DriveZToLoadPickup(Step):
         #drive tele
         self.event = Event()
         self.context.ic_interface.move_tele_async(Config().z_distance_to_load_pickup,
-                                                  Direction.Forward,
+                                                  DirectionTele.Extend,
                                                   lambda: self.event.set())
         self.event.wait()
         log.debug('DriveZToLoadPickup done')
@@ -141,7 +139,7 @@ class DriveZToTravelPosition(Step):
         #drive tele
         self.event = Event()
         self.context.ic_interface.move_tele_async(Config().z_travel_position,
-                                                  Direction.Backward,
+                                                  DirectionTele.Retract,
                                                   lambda: self.event.set())
         self.event.wait()
         log.debug('DriveZToTravelPosition done')
@@ -232,7 +230,7 @@ class DriveZToUnloadPosition(Step):
         #drive tele
         self.event = Event()
         self.context.ic_interface.move_tele_async(self.context.z_position_on_target,
-                                                  Direction.Forward,
+                                                  DirectionTele.Extend,
                                                   lambda: self.event.set())
         self.event.wait()
         log.debug('DriveZToUnloadPosition done')
@@ -267,7 +265,7 @@ class DriveZToEndPosition(Step):
         # drive tele
         self.event = Event()
         self.context.ic_interface.move_tele_async(self.context.z_position_rel,
-                                                  Direction.Backward,
+                                                  DirectionTele.Retract,
                                                   lambda: self.event.set())
         self.event.wait()
         log.debug('DriveZToEndPosition done')

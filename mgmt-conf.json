@@ -2,7 +2,7 @@
   "x_distance_to_load_pickup": 4800,
   "x_speed_to_load_pickup": 100,
   "x_position_to_start_load_pickup": 200,
-  "z_distance_to_load_pickup": 1000,
+  "z_distance_to_load_pickup": 200,
   "x_position_to_enable_magnet_load_pickup": 200,
   "z_position_to_enable_magnet_load_pickup": 100,
   "z_travel_position": 250,

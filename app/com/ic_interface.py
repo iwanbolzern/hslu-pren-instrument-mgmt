@@ -9,6 +9,10 @@ class Direction(Enum):
     Forward = 0
     Backward = 1
 
+class DirectionTele(Enum):
+    Retract = 0
+    Extend = 1
+
 class MagnetDirection(Enum):
     Enforce = 1
     Release = 0
@@ -54,7 +58,7 @@ class ICInterface:
     def unregister_position_callback(self, callback):
         self.callback_permanent[self.CMD_POSITION_FEEDBACK].remove(callback)
 
-    def move_tele_async(self, distance: int, direction: Direction, callback):
+    def move_tele_async(self, distance: int, direction: DirectionTele, callback):
         payload = distance.to_bytes(2, byteorder='big')
         payload += direction.value.to_bytes(1, byteorder='big')
 
