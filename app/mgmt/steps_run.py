@@ -1,3 +1,4 @@
+import time
 from threading import Event
 
 import math
@@ -87,6 +88,8 @@ class DriveZToLoadPickup(Step):
         self.event = Event()
         self.context.register_position_callback(self.__position_update_received)
         self.event.wait()
+
+        time.sleep(10)
 
         log.debug('DriveZToLoadPickup start move tele')
         #drive tele

@@ -1,5 +1,3 @@
-import numpy as np
-import matplotlib.pyplot as plt
 from scipy import interpolate
 
 
@@ -11,13 +9,13 @@ class Spline:
 
     @staticmethod
     def evaluate(spline, new_x):
-        return interpolate.splev(new_x, spline, der=0)
+        return interpolate.splev(new_x, spline, der=0).ravel()[0]
 
 
 class PosCalculation:
     x_rel = [0, 3080, 6144, 9200, 12264, 15336, 18392, 21448, 24496]  # x position on rope
-    x_abs = [21.3, 57.2, 93.3, 127.9, 164.1, 199.5, 234.1, 268.7, 302.9]  # abs x position on corresponding x_rel position
-    z_abs = [46, 47.3, 49.3, 52.6, 56.7, 61.2, 69.5, 77.3, 86.2]  # abs z position on corresponding x_rel position
+    x_abs = [213, 572, 933, 1279, 1641, 1995, 2341, 2687, 3029]  # abs x position on corresponding x_rel position
+    z_abs = [460, 473, 493, 526, 567, 612, 695, 773, 862]  # abs z position on corresponding x_rel position
 
     x_rel_to_x_abs_spline = Spline.get_spline(x_rel, x_abs)
     x_rel_to_z_abs_spline = Spline.get_spline(x_rel, z_abs)
@@ -29,11 +27,11 @@ class PosCalculation:
         :param x_rel:
         :return: absolute x position
         """
-        return Spline.evaluate(PosCalculation.x_rel_to_x_abs_spline, x_rel)
+        return int(round(Spline.evaluate(PosCalculation.x_rel_to_x_abs_spline, x_rel)))
 
     @staticmethod
     def calc_z_abs(x_rel, z_rel):
-        z_rope_height = Spline.evaluate(PosCalculation.x_rel_to_z_abs_spline, x_rel)  # function which gets from x_rel rope height
+        z_rope_height = int(round(Spline.evaluate(PosCalculation.x_rel_to_z_abs_spline, x_rel)))  # function which gets from x_rel rope height
         return z_rope_height - z_rel
 
     @staticmethod
@@ -44,8 +42,8 @@ class PosCalculation:
         :param x_offset: needed offset to drive
         :return: relative x to drive to get to new absolute x position
         """
-        x_rel_after_offset = Spline.evaluate(PosCalculation.x_abs_to_x_rel_spline, x_abs + x_offset)
-        x_rel_on_x_abs = Spline.evaluate(PosCalculation.x_abs_to_x_rel_spline, x_abs)
+        x_rel_after_offset = int(round(Spline.evaluate(PosCalculation.x_abs_to_x_rel_spline, x_abs + x_offset)))
+        x_rel_on_x_abs = int(round(Spline.evaluate(PosCalculation.x_abs_to_x_rel_spline, x_abs)))
         return x_rel_after_offset - x_rel_on_x_abs  # return f^-1(x_abs+x_offset) - f^-1(x_abs), f(x) := calc_x_abs
 
     @staticmethod

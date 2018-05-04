@@ -36,4 +36,5 @@ class InitStep(Step):
         log.debug('Init Tele started')
         self.context.ic_interface.init_tele()
         self.context.ui_interface.send_end_init()
+        self.context.reset_position()
         log.debug('Init Tele end')

@@ -32,12 +32,22 @@ class Context:
         self.position_callbacks = []
         self.ic_interface.register_position_callback(self.__position_update)
 
+    def reset_position(self):
+        self.load_present = True
+        self.x_position_rel = 0
+        self.z_position_rel = 0
+        self.x_position_abs = 0
+        self.z_position_abs = 0
+
+        self.__abs_x_offset = None
+        self.__z_position_on_target = None
+
     def __position_update(self, x_offset, z_offset):
         self.x_position_rel += x_offset
         self.z_position_rel += z_offset
         self.x_position_abs = self.position_calculation.calc_x_abs(self.x_position_rel)
         self.z_position_abs = self.position_calculation.calc_z_abs(self.x_position_rel, self.z_position_rel)
-
+        print('x_position: {}, z_position: {}'.format(self.x_position_abs, self.z_position_abs))
         for callback in self.position_callbacks:
             callback(self.x_position_abs, self.z_position_abs)
 
