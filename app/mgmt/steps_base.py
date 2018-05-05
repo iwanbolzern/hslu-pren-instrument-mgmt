@@ -6,7 +6,7 @@ from typing import List, Callable
 from com.ic_interface import ICInterface
 from com.ui_interface import UIInterface
 from mgmt.pos_callculation import PosCalculation
-from target_recognition import TargetRecognition
+from target_recognition_pi import TargetRecognition
 from mgmt_utils import log
 
 
