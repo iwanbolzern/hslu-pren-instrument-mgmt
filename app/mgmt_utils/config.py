@@ -20,6 +20,7 @@ class Environment(Enum):
 
 class Config(metaclass=Singleton):
 
+    PI_PATH = r'/home/pi/instrument-mgmt/mgmt-conf.json'
     FILE_PATH = r'../mgmt-conf.json'
 
     def __init__(self):
@@ -50,13 +51,22 @@ class Config(metaclass=Singleton):
         print("Started with config: {}".format(Config.FILE_PATH))
 
     def save_config(self):
-        with open(Config.FILE_PATH, 'w', encoding='utf-8') as f:
+        file_path = Config.FILE_PATH
+        if Path(Config.PI_PATH).exists():
+            file_path = Config.PI_PATH
+
+        with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(self.__dict__, f, indent=2)
 
     def load_config(self):
-        with open(Config.FILE_PATH, 'r', encoding='utf-8') as f:
+        file_path = Config.FILE_PATH
+        if Path(Config.PI_PATH).exists():
+            file_path = Config.PI_PATH
+
+        with open(file_path, 'r', encoding='utf-8') as f:
             self.__dict__ = json.load(f)
 
 
-
+if __name__ == '__main__':
+    config = Config()
 
