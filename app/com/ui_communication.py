@@ -40,12 +40,12 @@ class UICommunication:
                 self.clients[i].conn.send(length + payload)
                 i += 1
             except Exception as ex:
-                print("Not able to send to client: {}".format(self.clients[i].address))
-                self.clients[i].conn.shutdown(socket.SHUT_RDWR)
-                self.clients[i].conn.close()
-                print("Client {} removed from distribution list".format(self.clients[i].address))
-                self.clients.remove(self.clients[i])
-
+                client = self.clients[i]
+                self.clients.remove(client)
+                print("Not able to send to client: {}".format(client.address))
+                client.conn.shutdown(socket.SHUT_RDWR)
+                client.conn.close()
+                print("Client {} removed from distribution list".format(client.address))
 
     def stop(self):
         if self.listen_thread:
