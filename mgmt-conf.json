@@ -7,7 +7,7 @@
   "z_position_to_enable_magnet_load_pickup": 100,
   "z_travel_position": 200,
   "z_position_to_start_travel": 200,
-  "travel_speed": 20,
+  "travel_speed": 40,
   "max_adjust_offset": 6,
   "adjust_speed": 100,
   "adjust_offset_to_start_tele": 50,
