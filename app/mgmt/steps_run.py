@@ -180,7 +180,6 @@ class DriveToUnloadPlainInterrupt(Step):
         log.debug('_unload_plain_interrupt called')
         self.context.abs_x_offset = self.context.position_calculation.calc_abs_x_offset_from_centroid(x_centroid)
         self.context.target_recognition.unregister_callback(self._unload_plain_interrupt)
-        self.context.target_recognition.stop()
         self.event.set()
         log.debug('_unload_plain_interrupt event set')
 
@@ -195,7 +194,6 @@ class AdjustXPosition(Step):
         log.debug('AdjustXPosition run called')
         # register image recognition callback
         self.context.target_recognition.register_callback(self._unload_plain_interrupt)
-        self.context.target_recognition.start()
 
         while abs(self.context.abs_x_offset) > Config().max_adjust_offset:
             log.debug('AdjustXPosition offset procedure started with offset adjustment of '
@@ -228,7 +226,6 @@ class DriveZToUnloadPosition(Step):
         # register image recognition callback and wait until plain is near enough
         self.event = Event()
         self.context.target_recognition.register_callback(self._unload_plain_interrupt)
-        self.context.target_recognition.start()
         self.event.wait()
 
         log.debug('DriveZToUnloadPosition move tele started')
