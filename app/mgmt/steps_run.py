@@ -1,8 +1,6 @@
 import time
 from threading import Event
 
-import math
-
 from com.ic_interface import Direction, MagnetDirection, DirectionTele
 from mgmt import pos_callculation
 from mgmt.steps_base import Step, Context
@@ -199,11 +197,11 @@ class AdjustXPosition(Step):
         self.context.target_recognition.register_callback(self._unload_plain_interrupt)
         self.context.target_recognition.start()
 
-        while math.abs(self.context.abs_x_offset) > Config().max_adjust_offset:
+        while abs(self.context.abs_x_offset) > Config().max_adjust_offset:
             log.debug('AdjustXPosition offset procedure started with offset adjustment of: ' + self.context.x_offset)
             self.event = Event()
             direction = Direction.Forward if self.context.rel_x_offset > 0 else Direction.Backward
-            self.context.ic_interface.drive_distance_async(math.abs(self.context.rel_x_offset),
+            self.context.ic_interface.drive_distance_async(abs(self.context.rel_x_offset),
                                                            Config().adjust_speed, direction,
                                                            lambda: self.event.set())
             self.event.wait()
@@ -242,7 +240,7 @@ class DriveZToUnloadPosition(Step):
 
     def _unload_plain_interrupt(self, x_centroid, y_centroid):
         self.context.abs_x_offset = self.context.position_calculation.calc_abs_x_offset_from_centroid(x_centroid)
-        if math.abs(self.context.abs_x_offset) < self.adjust_offset_to_start_tele:
+        if abs(self.context.abs_x_offset) < self.adjust_offset_to_start_tele:
             self.context.target_recognition.unregister_callback(self._unload_plain_interrupt)
             self.event.set()
 
