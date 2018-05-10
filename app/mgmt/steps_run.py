@@ -240,7 +240,7 @@ class DriveZToUnloadPosition(Step):
 
     def _unload_plain_interrupt(self, x_centroid, y_centroid):
         self.context.abs_x_offset = self.context.position_calculation.calc_abs_x_offset_from_centroid(x_centroid)
-        if abs(self.context.abs_x_offset) < self.adjust_offset_to_start_tele:
+        if abs(self.context.abs_x_offset) < Config().adjust_offset_to_start_tele:
             self.context.target_recognition.unregister_callback(self._unload_plain_interrupt)
             self.event.set()
 
@@ -290,9 +290,9 @@ class DriveToEnd(Step):
         # drive to end
         self.event = Event()
         remaining_distance = pos_callculation.calc_x_rel(self.context.x_position_abs,
-                                                         Config.x_end_position_abs - self.context.x_position_abs)
+                                                         Config().x_end_position_abs - self.context.x_position_abs)
         self.context.ic_interface.drive_to_end_async(remaining_distance,
-                                                     Config.drive_to_end_speed,
+                                                     Config().drive_to_end_speed,
                                                      Direction.Forward,
                                                      lambda: self.event.set())
         self.event.wait()
