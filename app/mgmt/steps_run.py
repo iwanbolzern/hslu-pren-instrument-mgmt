@@ -180,7 +180,7 @@ class DriveToUnloadPlainInterrupt(Step):
 
     def _unload_plain_interrupt(self, x_centroid, y_centroid):
         log.debug('_unload_plain_interrupt called')
-        self.context.abs_x_offset = pos_callculation.calc_abs_x_offset_from_centroid(x_centroid)
+        self.context.abs_x_offset = self.context.pos_callculation.calc_abs_x_offset_from_centroid(x_centroid)
         self.context.target_recognition.unregister_callback(self._unload_plain_interrupt)
         self.context.target_recognition.stop()
         self.event.set()
