@@ -16,6 +16,7 @@ class UIInterface:
     CMD_POSITION_FEEDBACK = 4
     CMD_END_RUN = 5
     CMD_LOG = 6
+    CMD_BACK_TO_ORIGIN = 8
 
     def __init__(self):
         self.ui_com = UICommunication()
@@ -42,6 +43,12 @@ class UIInterface:
 
     def unregister_init_once(self, callback):
         self.callback[self.CMD_INIT].remove(callback)
+
+    def register_back_to_origin_once(self, callback):
+        self.callback[self.CMD_BACK_TO_ORIGIN].append(callback)
+
+    def unregister_back_to_origin(self, callback):
+        self.callback[self.CMD_BACK_TO_ORIGIN].append(callback)
 
     def register_start_once(self, callback):
         self.callback[self.CMD_START].append(callback)

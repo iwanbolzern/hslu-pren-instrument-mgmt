@@ -51,3 +51,7 @@ class PosCalculation:
     def calc_abs_x_offset_from_centroid(centroid: int):
         return 301 - centroid
 
+    @staticmethod
+    def pixel_to_x_offset():
+        pass
+

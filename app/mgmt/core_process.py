@@ -1,20 +1,13 @@
-from abc import abstractmethod
 from asyncio import Future
 from concurrent.futures import ThreadPoolExecutor
-from threading import Event
-from typing import List
 
 import functools
 
-from com.ic_interface import ICInterface
-from com.ui_interface import UIInterface
 from mgmt.steps_base import Step, Context, CancleStep, StepResult, SyncStep
-from mgmt.steps_init import WaitForInitStep, InitStep
+from mgmt.steps_init import WaitForInitStep, InitStep, BackToOriginStep
 from mgmt.steps_run import WaitForStartStep, DriveXToLoadPickup, DriveZToLoadPickup, EnforceMagnetStep, \
     DriveZToTravelPosition, DisableMagnet, UpdatePositionStep, DriveToUnloadPlainInterrupt, AdjustXPosition, DriveZToUnloadPosition, \
     ReleaseMagnet, DriveZToEndPosition, DriveToEnd
-from target_recognition import TargetRecognition
-from mgmt_utils import log
 
 
 class CoreProcess:
@@ -34,10 +27,12 @@ class CoreProcess:
     def _init_steps(self):
         wait_for_init_step = WaitForInitStep(self.context)
         init_step = InitStep(self.context)
+        back_to_origin_step = BackToOriginStep(self.context)
         wait_for_start_step = WaitForStartStep(self.context)
 
-        cancle_wait_for_start_step = CancleStep(self.context, [wait_for_start_step])
-        cancle_wait_for_init_step = CancleStep(self.context, [wait_for_init_step])
+        cancel_wait_for_start_step = CancleStep(self.context, [wait_for_start_step])
+        cancel_wait_for_init_step = CancleStep(self.context, [wait_for_init_step])
+        cancel_back_to_origin_step = CancleStep(self.context, [back_to_origin_step])
         # steps for run
         update_position_step = UpdatePositionStep(self.context)
         cancel_update_position_step = CancleStep(self.context, [update_position_step])
@@ -59,13 +54,18 @@ class CoreProcess:
 
         # connect steps
         # init loop
-        wait_for_init_step.set_next_steps([cancle_wait_for_start_step])
-        cancle_wait_for_start_step.set_next_steps([init_step])
-        init_step.set_next_steps([wait_for_start_step, wait_for_init_step])
+        wait_for_init_step.set_next_steps([cancel_wait_for_start_step])
+        cancel_wait_for_start_step.set_next_steps([cancel_back_to_origin_step])
+        cancel_back_to_origin_step.set_next_steps([init_step])
+        init_step.set_next_steps([wait_for_start_step, wait_for_init_step, back_to_origin_step])
+
+        # back to origin loop
+        back_to_origin_step.set_next_steps([back_to_origin_step])
 
         #start loop
-        wait_for_start_step.set_next_steps([cancle_wait_for_init_step])
-        cancle_wait_for_init_step.set_next_steps([update_position_step,
+        wait_for_start_step.set_next_steps([cancel_back_to_origin_step])
+        cancel_back_to_origin_step.set_next_steps([cancel_wait_for_init_step])
+        cancel_wait_for_init_step.set_next_steps([update_position_step,
                                                   drive_x_to_load_pickup_step,
                                                   drive_z_to_load_pickup_step,
                                                   enforce_magnet_step])
@@ -89,10 +89,11 @@ class CoreProcess:
         drive_to_end.set_next_steps([cancel_update_position_step])
         cancel_update_position_step.set_next_steps([end_sync_step])
         end_sync_step.set_next_steps([wait_for_start_step,
-                                      wait_for_init_step])
+                                      wait_for_init_step,
+                                      back_to_origin_step])
 
         # set start steps
-        self._set_start_steps([wait_for_start_step, wait_for_init_step])
+        self._set_start_steps([wait_for_start_step, wait_for_init_step, back_to_origin_step])
 
     def start_process(self):
         for step in self.start_steps:
