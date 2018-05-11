@@ -16,7 +16,7 @@ class PosCalculation:
     x_rel = [0, 3080, 6144, 9200, 12264, 15336, 18392, 21448, 24496]  # x position on rope
     x_abs = [213, 572, 933, 1279, 1641, 1995, 2341, 2687, 3029]  # abs x position on corresponding x_rel position
     z_abs = [460, 473, 493, 526, 567, 612, 695, 773, 862]  # abs z position on corresponding x_rel position
-    z_offset_cube = 26   # Distance from where we measured z to where the cube actually is
+    z_offset_cube = 260   # Distance from where we measured z to where the cube actually is
 
     x_rel_to_x_abs_spline = Spline.get_spline(x_rel, x_abs)
     x_rel_to_z_abs_spline = Spline.get_spline(x_rel, z_abs)
