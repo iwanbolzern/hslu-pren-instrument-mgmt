@@ -147,7 +147,7 @@ class DriveZToTravelPosition(Step):
 class DisableMagnet(Step):
 
     def __init__(self, context: Context):
-        super(ReleaseMagnet, self).__init__(context)
+        super(DisableMagnet, self).__init__(context)
 
     def run(self):
         log.debug('DisableMagnet run called')
