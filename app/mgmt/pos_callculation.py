@@ -44,7 +44,7 @@ class PosCalculation:
         """
         x_rel_after_offset = int(round(Spline.evaluate(PosCalculation.x_abs_to_x_rel_spline, x_abs + x_offset)))
         x_rel_on_x_abs = int(round(Spline.evaluate(PosCalculation.x_abs_to_x_rel_spline, x_abs)))
-        return x_rel_after_offset - x_rel_on_x_abs  # return f^-1(x_abs+x_offset) - f^-1(x_abs), f(x) := calc_x_abs
+        return max([x_rel_on_x_abs, x_rel_after_offset]) - min([x_rel_on_x_abs, x_rel_after_offset])  # return f^-1(x_abs+x_offset) - f^-1(x_abs), f(x) := calc_x_abs
 
     @staticmethod
     def calc_abs_x_offset_from_centroid(centroid: int):
