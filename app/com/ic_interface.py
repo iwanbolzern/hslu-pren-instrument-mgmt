@@ -14,8 +14,8 @@ class DirectionTele(Enum):
     Extend = 1
 
 class MagnetDirection(Enum):
-    Enforce = 1
-    Release = 0
+    Enforce = 0
+    Release = 1
 
 class ICInterface:
 

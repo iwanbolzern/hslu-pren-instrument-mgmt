@@ -48,5 +48,5 @@ class PosCalculation:
 
     @staticmethod
     def calc_abs_x_offset_from_centroid(centroid: int):
-        return 140 - centroid
+        return 301 - centroid
 
