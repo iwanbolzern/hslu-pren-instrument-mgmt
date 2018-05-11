@@ -87,8 +87,6 @@ class DriveZToLoadPickup(Step):
         self.context.register_position_callback(self.__position_update_received)
         self.event.wait()
 
-        time.sleep(10)
-
         log.debug('DriveZToLoadPickup start move tele')
         #drive tele
         self.event = Event()
@@ -144,6 +142,17 @@ class DriveZToTravelPosition(Step):
                                                   lambda: self.event.set())
         self.event.wait()
         log.debug('DriveZToTravelPosition done')
+
+
+class DisableMagnet(Step):
+
+    def __init__(self, context: Context):
+        super(ReleaseMagnet, self).__init__(context)
+
+    def run(self):
+        log.debug('DisableMagnet run called')
+        self.context.ic_interface.disable_magnet()
+        log.debug('DisableMagnet done')
 
 
 class DriveToUnloadPlainInterrupt(Step):
@@ -228,7 +237,8 @@ class DriveZToUnloadPosition(Step):
         self.context.target_recognition.register_callback(self._unload_plain_interrupt)
         self.event.wait()
 
-        log.debug('DriveZToUnloadPosition move tele started')
+        log.debug('DriveZToUnloadPosition move tele started: z_position_on_target {}'
+                  .format(self.context.z_position_on_target))
         #drive tele
         self.event = Event()
         self.context.ic_interface.move_tele_async(self.context.z_position_on_target,

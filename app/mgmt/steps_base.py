@@ -47,7 +47,7 @@ class Context:
         self.z_position_rel += z_offset
         self.x_position_abs = self.position_calculation.calc_x_abs(self.x_position_rel)
         self.z_position_abs = self.position_calculation.calc_z_abs(self.x_position_rel, self.z_position_rel)
-        print('x_position: {}, z_position: {}'.format(self.x_position_abs, self.z_position_abs))
+        #print('x_position: {}, z_position: {}'.format(self.x_position_abs, self.z_position_abs))
         for callback in self.position_callbacks:
             callback(self.x_position_abs, self.z_position_abs)
 
@@ -72,7 +72,7 @@ class Context:
     @abs_x_offset.setter
     def abs_x_offset(self, value):
         self.__abs_x_offset = value
-        self.__z_position_on_target = self.position_calculation.calc_z_abs(self.z_position_rel + self.rel_x_offset,
+        self.__z_position_on_target = self.position_calculation.calc_z_abs(self.x_position_rel + self.rel_x_offset,
                                                                   self.z_position_rel)
 
 

@@ -86,6 +86,9 @@ class ICInterface:
 
         self.ic_com.send_msg(self.CMD_ENABLE_MAGNET, payload)
 
+    def disable_magnet(self):
+        self.ic_com.send_msg(self.CMD_DISABLE_MAGNET)
+
     def drive_to_end_async(self, predicted_distance: int, speed: int, direction: Direction, callback):
         payload = predicted_distance.to_bytes(2, byteorder='big')
         payload += speed.to_bytes(1, byteorder='big')

@@ -11,7 +11,7 @@ from com.ui_interface import UIInterface
 from mgmt.steps_base import Step, Context, CancleStep, StepResult, SyncStep
 from mgmt.steps_init import WaitForInitStep, InitStep
 from mgmt.steps_run import WaitForStartStep, DriveXToLoadPickup, DriveZToLoadPickup, EnforceMagnetStep, \
-    DriveZToTravelPosition, UpdatePositionStep, DriveToUnloadPlainInterrupt, AdjustXPosition, DriveZToUnloadPosition, \
+    DriveZToTravelPosition, DisableMagnet, UpdatePositionStep, DriveToUnloadPlainInterrupt, AdjustXPosition, DriveZToUnloadPosition, \
     ReleaseMagnet, DriveZToEndPosition, DriveToEnd
 from target_recognition import TargetRecognition
 from mgmt_utils import log
@@ -46,6 +46,7 @@ class CoreProcess:
         enforce_magnet_step = EnforceMagnetStep(self.context)
         sync_pickup_steps = SyncStep(self.context, 3)
         drive_z_to_travel_position = DriveZToTravelPosition(self.context)
+        disable_magnet_step = DisableMagnet(self.context)
         drive_to_unload_plain_interrupt = DriveToUnloadPlainInterrupt(self.context)
         travel_sync_step = SyncStep(self.context, 2)
         adjust_x_position = AdjustXPosition(self.context)
@@ -74,7 +75,8 @@ class CoreProcess:
         enforce_magnet_step.set_next_steps([sync_pickup_steps])
         sync_pickup_steps.set_next_steps([drive_z_to_travel_position,
                                           drive_to_unload_plain_interrupt])
-        drive_z_to_travel_position.set_next_steps([travel_sync_step])
+        drive_z_to_travel_position.set_next_steps([disable_magnet_step])
+        disable_magnet_step.set_next_steps([travel_sync_step])
         drive_to_unload_plain_interrupt.set_next_steps([travel_sync_step])
         travel_sync_step.set_next_steps([adjust_x_position,
                                          drive_z_to_unload_position])
