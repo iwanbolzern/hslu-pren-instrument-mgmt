@@ -23,7 +23,7 @@ class BackToOriginStep(Step):
 
     def cancel(self):
         super(BackToOriginStep, self).cancel()
-        self.context.ui_interface.unregister_init_once(self.event.set)
+        self.context.ui_interface.unregister_back_to_origin(self.event.set)
         self.event.set()
 
 class WaitForInitStep(Step):
