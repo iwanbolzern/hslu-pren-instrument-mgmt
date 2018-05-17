@@ -26,6 +26,7 @@ class BackToOriginStep(Step):
         self.context.ui_interface.unregister_back_to_origin(self.event.set)
         self.event.set()
 
+
 class WaitForInitStep(Step):
 
     def __init__(self, context: Context):
