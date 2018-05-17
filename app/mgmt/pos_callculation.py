@@ -17,10 +17,13 @@ class PosCalculation:
     x_abs = [213, 572, 933, 1279, 1641, 1995, 2341, 2687, 3029]  # abs x position on corresponding x_rel position
     z_abs = [460, 473, 493, 526, 567, 612, 695, 773, 862]  # abs z position on corresponding x_rel position
     z_offset_cube = 260   # Distance from where we measured z to where the cube actually is
+    x_middle_for_centroid_x_abs = [876, 1724, 2768]
+    x_middle_for_centroid = [320, 310, 301]
 
     x_rel_to_x_abs_spline = Spline.get_spline(x_rel, x_abs)
     x_rel_to_z_abs_spline = Spline.get_spline(x_rel, z_abs)
     x_abs_to_x_rel_spline = Spline.get_spline(x_abs, x_rel)
+    x_middle_from_centroid_spline = Spline.get_spline(x_middle_for_centroid_x_abs, x_middle_for_centroid)
 
     @staticmethod
     def calc_x_abs(x_rel):
@@ -48,8 +51,9 @@ class PosCalculation:
         return max([x_rel_on_x_abs, x_rel_after_offset]) - min([x_rel_on_x_abs, x_rel_after_offset])  # return f^-1(x_abs+x_offset) - f^-1(x_abs), f(x) := calc_x_abs
 
     @staticmethod
-    def calc_abs_x_offset_from_centroid(centroid: int):
-        return 301 - centroid
+    def calc_abs_x_offset_from_centroid(abs_x_position: int, centroid: int):
+        centroid_position = Spline.evaluate(PosCalculation.x_middle_from_centroid_spline, abs_x_position)
+        return centroid_position
 
     @staticmethod
     def pixel_to_x_offset():

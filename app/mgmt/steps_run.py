@@ -204,16 +204,16 @@ class AdjustXPosition(Step):
         # register image recognition callback
         self.context.target_recognition.register_callback(self._unload_plain_interrupt)
 
-        while abs(self.context.abs_x_offset) > Config().max_adjust_offset:
-            log.debug('AdjustXPosition offset procedure started with offset adjustment of '
-                      'abs_x_offset: {} and rel_x_offset: {}'.format(self.context.abs_x_offset,
-                                                                     self.context.rel_x_offset))
-            self.event = Event()
-            direction = Direction.Forward if self.context.rel_x_offset > 0 else Direction.Backward
-            self.context.ic_interface.drive_distance_async(abs(self.context.rel_x_offset),
-                                                           Config().adjust_speed, direction,
-                                                           lambda: self.event.set())
-            self.event.wait()
+        #while abs(self.context.abs_x_offset) > Config().max_adjust_offset:
+        log.debug('AdjustXPosition offset procedure started with offset adjustment of '
+                  'abs_x_offset: {} and rel_x_offset: {}'.format(self.context.abs_x_offset,
+                                                                 self.context.rel_x_offset))
+        self.event = Event()
+        direction = Direction.Forward if self.context.rel_x_offset > 0 else Direction.Backward
+        self.context.ic_interface.drive_distance_async(abs(self.context.rel_x_offset),
+                                                       Config().adjust_speed, direction,
+                                                       lambda: self.event.set())
+        self.event.wait()
 
         self.context.target_recognition.unregister_callback(self._unload_plain_interrupt)
         self.context.target_recognition.stop()
