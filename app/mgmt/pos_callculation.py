@@ -4,7 +4,7 @@ from scipy import interpolate
 class Spline:
     @staticmethod
     def get_spline(x, y, k=4):
-        tck = interpolate.splrep(x, y, s=0)
+        tck = interpolate.splrep(x, y, s=0, k=k)
         return tck
 
     @staticmethod
