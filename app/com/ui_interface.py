@@ -48,7 +48,7 @@ class UIInterface:
         self.callback[self.CMD_BACK_TO_ORIGIN].append(callback)
 
     def unregister_back_to_origin(self, callback):
-        self.callback[self.CMD_BACK_TO_ORIGIN].append(callback)
+        self.callback[self.CMD_BACK_TO_ORIGIN].remove(callback)
 
     def register_start_once(self, callback):
         self.callback[self.CMD_START].append(callback)
