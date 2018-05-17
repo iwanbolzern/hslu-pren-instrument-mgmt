@@ -222,7 +222,8 @@ class AdjustXPosition(Step):
         log.debug('AdjustXPosition done')
 
     def _unload_plain_interrupt(self, x_centroid, y_centroid):
-        self.context.abs_x_offset = self.context.position_calculation.calc_abs_x_offset_from_centroid(x_centroid)
+        self.context.abs_x_offset = self.context.position_calculation \
+            .calc_abs_x_offset_from_centroid(self.context.x_position_abs, x_centroid)
 
 
 class DriveZToUnloadPosition(Step):
