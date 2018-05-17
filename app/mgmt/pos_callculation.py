@@ -53,7 +53,7 @@ class PosCalculation:
     @staticmethod
     def calc_abs_x_offset_from_centroid(abs_x_position: int, centroid: int):
         centroid_position = Spline.evaluate(PosCalculation.x_middle_from_centroid_spline, abs_x_position)
-        return centroid_position
+        return centroid_position - centroid
 
     @staticmethod
     def pixel_to_x_offset():
