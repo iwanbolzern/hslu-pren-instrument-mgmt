@@ -78,10 +78,9 @@ class CoreProcess:
         drive_z_to_travel_position.set_next_steps([disable_magnet_step])
         disable_magnet_step.set_next_steps([travel_sync_step])
         drive_to_unload_plain_interrupt.set_next_steps([travel_sync_step])
-        travel_sync_step.set_next_steps([adjust_x_position,
-                                         drive_z_to_unload_position])
-        adjust_x_position.set_next_steps([unload_sync_step])
-        drive_z_to_unload_position.set_next_steps([unload_sync_step])
+        travel_sync_step.set_next_steps([adjust_x_position])
+        adjust_x_position.set_next_steps([drive_z_to_unload_position])
+        drive_z_to_unload_position.set_next_steps([release_magnet])
         unload_sync_step.set_next_steps([release_magnet])
         release_magnet.set_next_steps([drive_z_to_end_position,
                                        drive_to_end])

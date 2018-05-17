@@ -235,9 +235,9 @@ class DriveZToUnloadPosition(Step):
     def run(self):
         log.debug('DriveZToUnloadPosition run called')
         # register image recognition callback and wait until plain is near enough
-        self.event = Event()
-        self.context.target_recognition.register_callback(self._unload_plain_interrupt)
-        self.event.wait()
+        #self.event = Event()
+        #self.context.target_recognition.register_callback(self._unload_plain_interrupt)
+        #self.event.wait()
 
         log.debug('DriveZToUnloadPosition move tele started: z_position_on_target {}'
                   .format(self.context.z_position_on_target))
