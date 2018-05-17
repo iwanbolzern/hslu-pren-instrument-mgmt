@@ -55,16 +55,14 @@ class CoreProcess:
         # connect steps
         # init loop
         wait_for_init_step.set_next_steps([cancel_wait_for_start_step])
-        cancel_wait_for_start_step.set_next_steps([cancel_back_to_origin_step])
-        cancel_back_to_origin_step.set_next_steps([init_step])
+        cancel_wait_for_start_step.set_next_steps([init_step])
         init_step.set_next_steps([wait_for_start_step, wait_for_init_step, back_to_origin_step])
 
         # back to origin loop
         back_to_origin_step.set_next_steps([back_to_origin_step])
 
         #start loop
-        wait_for_start_step.set_next_steps([cancel_back_to_origin_step])
-        cancel_back_to_origin_step.set_next_steps([cancel_wait_for_init_step])
+        wait_for_start_step.set_next_steps([cancel_wait_for_init_step])
         cancel_wait_for_init_step.set_next_steps([update_position_step,
                                                   drive_x_to_load_pickup_step,
                                                   drive_z_to_load_pickup_step,
