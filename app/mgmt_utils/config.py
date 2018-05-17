@@ -65,8 +65,3 @@ class Config(metaclass=Singleton):
 
         with open(file_path, 'r', encoding='utf-8') as f:
             self.__dict__ = json.load(f)
-
-
-if __name__ == '__main__':
-    config = Config()
-

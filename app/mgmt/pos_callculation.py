@@ -3,7 +3,7 @@ from scipy import interpolate
 
 class Spline:
     @staticmethod
-    def get_spline(x, y):
+    def get_spline(x, y, k=4):
         tck = interpolate.splrep(x, y, s=0)
         return tck
 
@@ -23,7 +23,7 @@ class PosCalculation:
     x_rel_to_x_abs_spline = Spline.get_spline(x_rel, x_abs)
     x_rel_to_z_abs_spline = Spline.get_spline(x_rel, z_abs)
     x_abs_to_x_rel_spline = Spline.get_spline(x_abs, x_rel)
-    x_middle_from_centroid_spline = Spline.get_spline(x_middle_for_centroid_x_abs, x_middle_for_centroid)
+    x_middle_from_centroid_spline = Spline.get_spline(x_middle_for_centroid_x_abs, x_middle_for_centroid, k=2)
 
     @staticmethod
     def calc_x_abs(x_rel):
