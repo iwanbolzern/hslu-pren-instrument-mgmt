@@ -300,7 +300,7 @@ class DriveToEnd(Step):
         log.debug('DriveToEnd start drive')
         # drive to end
         self.event = Event()
-        remaining_distance = pos_callculation.calc_x_rel(self.context.x_position_abs,
+        remaining_distance = self.pos_callculation.calc_x_rel(self.context.x_position_abs,
                                                          Config().x_end_position_abs - self.context.x_position_abs)
         self.context.ic_interface.drive_to_end_async(remaining_distance,
                                                      Config().drive_to_end_speed,
