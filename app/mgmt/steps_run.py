@@ -192,6 +192,7 @@ class DriveToUnloadPlainInterrupt(Step):
         self.context.target_recognition.unregister_callback(self._unload_plain_interrupt)
         self.event.set()
         log.debug('_unload_plain_interrupt event set')
+        self.context.target_recognition.stop()
 
 
 class AdjustXPosition(Step):
@@ -203,7 +204,7 @@ class AdjustXPosition(Step):
     def run(self):
         log.debug('AdjustXPosition run called')
         # register image recognition callback
-        self.context.target_recognition.register_callback(self._unload_plain_interrupt)
+        #self.context.target_recognition.register_callback(self._unload_plain_interrupt)
 
         #while abs(self.context.abs_x_offset) > Config().max_adjust_offset:
         log.debug('AdjustXPosition offset procedure started with offset adjustment of '
@@ -216,8 +217,8 @@ class AdjustXPosition(Step):
                                                        lambda: self.event.set())
         self.event.wait()
 
-        self.context.target_recognition.unregister_callback(self._unload_plain_interrupt)
-        self.context.target_recognition.stop()
+        #self.context.target_recognition.unregister_callback(self._unload_plain_interrupt)
+        #self.context.target_recognition.stop()
 
         log.debug('AdjustXPosition done')
 
