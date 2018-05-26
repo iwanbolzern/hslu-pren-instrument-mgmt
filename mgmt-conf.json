@@ -1,18 +1,18 @@
 {
   "x_distance_to_load_pickup": 3900,
-  "x_speed_to_load_pickup": 70,
+  "x_speed_to_load_pickup": 90,
   "x_position_to_start_load_pickup": 430,
   "z_distance_to_load_pickup": 200,
   "x_position_to_enable_magnet_load_pickup": 200,
   "z_position_to_enable_magnet_load_pickup": 100,
   "z_travel_position": 195,
-  "z_position_to_start_travel": 200,
-  "travel_speed": 70,
+  "z_position_to_start_travel": 100,
+  "travel_speed": 90,
   "max_adjust_offset": 6,
   "adjust_speed": 70,
   "adjust_offset_to_start_tele": 50,
   "z_end_position": 0,
-  "z_position_to_drive_to_end": 200,
+  "z_position_to_drive_to_end": 100,
   "drive_to_end_speed": 100,
-  "x_end_position_abs": 2950
+  "x_end_position_abs": 3100
 }
