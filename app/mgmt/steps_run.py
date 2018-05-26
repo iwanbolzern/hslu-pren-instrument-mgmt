@@ -94,6 +94,7 @@ class DriveZToLoadPickup(Step):
                                                   DirectionTele.Extend,
                                                   lambda: self.event.set())
         self.event.wait()
+        self.context.load_present = True
         log.debug('DriveZToLoadPickup done')
 
     def __position_update_received(self, x_position, z_position):
@@ -266,6 +267,7 @@ class ReleaseMagnet(Step):
     def run(self):
         log.debug('ReleaseMagnet run called')
         self.context.ic_interface.enable_magnet(MagnetDirection.Release)
+        self.context.load_present = False
         log.debug('ReleaseMagnet done')
 
 

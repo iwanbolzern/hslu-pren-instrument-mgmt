@@ -19,7 +19,7 @@ class Context:
         self.position_calculation = PosCalculation()
 
         # infos
-        self.load_present = True
+        self.load_present = False
         self.x_position_rel = 0
         self.z_position_rel = 0
         self.x_position_abs = 0
@@ -33,7 +33,7 @@ class Context:
         self.ic_interface.register_position_callback(self.__position_update)
 
     def reset_position(self):
-        self.load_present = True
+        self.load_present = False
         self.x_position_rel = 0
         self.z_position_rel = 0
         self.x_position_abs = 0
