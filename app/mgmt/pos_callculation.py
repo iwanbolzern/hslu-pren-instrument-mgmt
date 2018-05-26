@@ -55,4 +55,4 @@ class PosCalculation:
     def calc_abs_x_offset_from_centroid(abs_x_position: int, centroid: int):
         centroid_position = Spline.evaluate(PosCalculation.x_middle_from_centroid_spline, abs_x_position)
         pixel_to_mm_factor = Spline.evaluate(PosCalculation.pixel_to_mm_factor_spline, abs_x_position)
-        return (centroid_position - centroid) * pixel_to_mm_factor
+        return (centroid_position - centroid) * pixel_to_mm_factor - 50
