@@ -18,7 +18,7 @@ class PosCalculation:
     z_abs = [460, 473, 493, 526, 567, 612, 695, 773, 862]  # abs z position on corresponding x_rel position
     z_offset_cube = 260   # Distance from where we measured z to where the cube actually is
     x_middle_for_centroid = [232, 225, 224, 216, 219, 218, 213, 211, 216]
-    pixel_to_mm_factor = [0.092, 0.091, 0.096, 0.105, 0.12, 0.13, 0.14, 0.165, 0.185]  # used with x_abs
+    pixel_to_mm_factor = [0.92, 0.91, 0.96, 1.05, 1.2, 1.3, 1.4, 1.65, 1.85]  # used with x_abs
 
     x_rel_to_x_abs_spline = Spline.get_spline(x_rel, x_abs)
     x_rel_to_z_abs_spline = Spline.get_spline(x_rel, z_abs)
