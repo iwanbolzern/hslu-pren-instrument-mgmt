@@ -311,6 +311,7 @@ class DriveToEnd(Step):
                                                      Direction.Forward,
                                                      lambda: self.event.set())
         self.event.wait()
+        self.context.ui_interface.send_end()
         log.debug('DriveToEnd done')
 
     def _position_update_received(self, x_position, z_position):
