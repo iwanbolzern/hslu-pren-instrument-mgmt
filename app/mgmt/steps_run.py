@@ -285,6 +285,7 @@ class DriveZToEndPosition(Step):
                                                   DirectionTele.Retract,
                                                   lambda: self.event.set())
         self.event.wait()
+        self.context.ic_interface.disable_magnet()
         log.debug('DriveZToEndPosition done')
 
 
